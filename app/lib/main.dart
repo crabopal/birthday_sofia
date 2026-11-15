@@ -55,7 +55,7 @@ class GameRoot extends StatefulWidget {
   State<GameRoot> createState() => _GameRootState();
 }
 
-class _GameRootState extends State<GameRoot> {
+class _GameRootState extends State<GameRoot> with WidgetsBindingObserver {
   late GamePhase _phase;
 
   @override
@@ -63,6 +63,7 @@ class _GameRootState extends State<GameRoot> {
     super.initState();
     _phase = widget.controller.snapshot.phase;
     widget.controller.addListener(_onControllerTick);
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
@@ -83,7 +84,22 @@ class _GameRootState extends State<GameRoot> {
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.paused:
+      case AppLifecycleState.hidden:
+      case AppLifecycleState.detached:
+        widget.controller.music.pauseForLifecycle();
+        widget.controller.voice.stopAll();
+      case AppLifecycleState.resumed:
+        widget.controller.music.resumeAfterLifecycle();
+    }
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     widget.controller.removeListener(_onControllerTick);
     super.dispose();
   }

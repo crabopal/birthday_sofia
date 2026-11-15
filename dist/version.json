@@ -1,6 +1,6 @@
 {
-  "versionCode": 15,
-  "versionName": "1.2.9",
+  "versionCode": 16,
+  "versionName": "1.2.10",
   "apkUrl": "https://raw.githubusercontent.com/crabopal/birthday_sofia/cursor%2Fsonya-birthday-game-apk-922d/dist/sonya-birthday-release.apk",
-  "notes": "Phone-friendly lobby: sticky buttons, stacked layout, portrait allowed"
+  "notes": "Pause BGM when phone locks or app goes to background"
 }

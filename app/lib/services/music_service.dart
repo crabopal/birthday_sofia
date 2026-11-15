@@ -9,6 +9,7 @@ class MusicService {
   AudioPlayer? _player;
   bool _disabled = false;
   bool _started = false;
+  bool _lifecyclePaused = false;
 
   static const double menuVolume = 0.38;
   static const double levelVolume = 0.10;
@@ -29,6 +30,7 @@ class MusicService {
       await _audio.setVolume(menuVolume);
       await _audio.play(AssetSource('audio/music/theme_original.mp3'));
       _started = true;
+      _lifecyclePaused = false;
     } catch (e) {
       debugPrint('MusicService start failed: $e');
     }
@@ -39,7 +41,6 @@ class MusicService {
     final vol = _duckDepth > 0 ? duckedVolume : _baseVolume;
     try {
       await _audio.setVolume(vol);
-      if (_started) await _audio.resume();
     } catch (_) {}
   }
 
@@ -72,10 +73,25 @@ class MusicService {
   }
 
   Future<void> resume() async {
-    if (_disabled) return;
+    if (_disabled || !_started || _lifecyclePaused) return;
     try {
       await _audio.resume();
     } catch (_) {}
+  }
+
+  /// Phone lock / app background — stop the bed until foreground again.
+  Future<void> pauseForLifecycle() async {
+    _lifecyclePaused = true;
+    await pause();
+  }
+
+  Future<void> resumeAfterLifecycle() async {
+    if (_disabled) return;
+    _lifecyclePaused = false;
+    if (_started) {
+      await _applyVolume();
+      await resume();
+    }
   }
 
   Future<void> dispose() async {
