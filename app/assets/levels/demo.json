@@ -1,0 +1,52 @@
+{
+  "title": "С днем рождения, Соня",
+  "voiceLines": {
+    "spin": "assets/audio/voice/spin.wav",
+    "correct": "assets/audio/voice/correct.wav",
+    "wrong": "assets/audio/voice/wrong.wav",
+    "victory": "assets/audio/voice/victory.wav",
+    "level_start": "assets/audio/voice/level_start.wav"
+  },
+  "levels": [
+    {
+      "id": "L1",
+      "letterIndex": 0,
+      "type": "picture_question",
+      "title": "Буква С",
+      "question": "Какой цвет у главного робокара-спасателя?",
+      "answer": "красный",
+      "acceptedAnswers": ["красный", "красныи", "red"],
+      "imageAsset": "assets/images/demo_car.png",
+      "voiceLines": {
+        "start": "assets/audio/voice/level_start.wav"
+      }
+    },
+    {
+      "id": "L2",
+      "letterIndex": 1,
+      "type": "video_question",
+      "title": "Буква Д",
+      "question": "Какое английское слово было на экране жёлтым?",
+      "answer": "VIDEO",
+      "acceptedAnswers": ["VIDEO", "video", "VIDEO DEMO", "video demo"],
+      "videoAsset": "assets/video/demo_question.mp4",
+      "pauseAtMs": 3000,
+      "voiceLines": {
+        "start": "assets/audio/voice/level_start.wav"
+      }
+    },
+    {
+      "id": "L3",
+      "letterIndex": 2,
+      "type": "audio_question",
+      "title": "Буква Н",
+      "question": "Сколько нот прозвучало в мелодии?",
+      "answer": "3",
+      "acceptedAnswers": ["3", "три"],
+      "audioAsset": "assets/audio/demo_question.wav",
+      "voiceLines": {
+        "start": "assets/audio/voice/level_start.wav"
+      }
+    }
+  ]
+}

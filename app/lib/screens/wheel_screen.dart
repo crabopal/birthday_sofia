@@ -1,0 +1,134 @@
+import 'package:material_ui/material_ui.dart';
+
+import '../controllers/game_controller.dart';
+import '../theme/app_theme.dart';
+import '../wheel/wheel_widget.dart';
+import '../widgets/scanlines.dart';
+import '../widgets/tv_button.dart';
+
+class WheelScreen extends StatefulWidget {
+  const WheelScreen({super.key, required this.controller});
+
+  final GameController controller;
+
+  @override
+  State<WheelScreen> createState() => _WheelScreenState();
+}
+
+class _WheelScreenState extends State<WheelScreen>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _anim;
+  final ValueNotifier<double> _turns = ValueNotifier(0);
+  bool _spinning = false;
+  String? _winner;
+
+  @override
+  void initState() {
+    super.initState();
+    _anim = AnimationController(vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _anim.dispose();
+    _turns.dispose();
+    super.dispose();
+  }
+
+  Future<void> _spin() async {
+    if (_spinning) return;
+    setState(() {
+      _spinning = true;
+      _winner = null;
+    });
+
+    final result = await widget.controller.prepareSpin();
+    final names = widget.controller.wheelNames;
+    await animateWheelToIndex(
+      controller: _anim,
+      turns: _turns,
+      targetIndex: result.index,
+      segmentCount: names.length,
+    );
+    widget.controller.finishSpin(result.winner);
+    setState(() {
+      _winner = result.winner;
+      _spinning = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final names = widget.controller.wheelNames.isNotEmpty
+        ? widget.controller.wheelNames
+        : widget.controller.snapshot.guests;
+
+    return PixelScaffold(
+      title: 'КТО ИГРАЕТ?',
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Row(
+          children: [
+            Expanded(
+              flex: 5,
+              child: ValueListenableBuilder<double>(
+                valueListenable: _turns,
+                builder: (context, turns, _) {
+                  return ParticipantWheel(
+                    names: names,
+                    rotationTurns: turns,
+                    winner: _winner,
+                  );
+                },
+              ),
+            ),
+            const SizedBox(width: 24),
+            Expanded(
+              flex: 4,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Равноразделенный круг.\nВыбывает до нового круга.',
+                    style: TextStyle(
+                      fontFamily: 'PressStart2P',
+                      fontSize: 10,
+                      height: 1.7,
+                      color: PoliColors.cream,
+                    ),
+                  ),
+                  const SizedBox(height: 28),
+                  if (_winner == null)
+                    TvButton(
+                      label: _spinning ? 'КРУТИТСЯ...' : 'КРУТИТЬ',
+                      autofocus: true,
+                      enabled: !_spinning,
+                      onPressed: _spinning ? null : _spin,
+                    )
+                  else ...[
+                    Text(
+                      'Ход: $_winner',
+                      style: const TextStyle(
+                        fontFamily: 'PressStart2P',
+                        fontSize: 14,
+                        color: PoliColors.beaconYellow,
+                        height: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    TvButton(
+                      label: 'К УРОВНЮ',
+                      autofocus: true,
+                      onPressed: () => widget.controller.openLevel(),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
