@@ -171,13 +171,13 @@ class _SplashScreenState extends State<SplashScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
-                    _HeroChar('assets/images/chars/poli_blue.jpg'),
+                    _HeroChar('assets/images/chars/poli.jpg'),
                     SizedBox(width: 14),
-                    _HeroChar('assets/images/chars/amber_pink.jpg'),
+                    _HeroChar('assets/images/chars/roy.jpg'),
                     SizedBox(width: 14),
-                    _HeroChar('assets/images/chars/roy_red.jpg'),
+                    _HeroChar('assets/images/chars/amber.jpg'),
                     SizedBox(width: 14),
-                    _HeroChar('assets/images/chars/helly_green.jpg'),
+                    _HeroChar('assets/images/chars/helly.jpg'),
                   ],
                 ),
                 const SizedBox(height: 18),

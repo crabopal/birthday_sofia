@@ -8,6 +8,7 @@ import '../services/media_resolver.dart';
 import '../theme/app_theme.dart';
 import '../widgets/letter_progress.dart';
 import '../widgets/pixel_scaffold.dart';
+import '../widgets/robocar_avatar.dart';
 import '../widgets/tv_button.dart';
 
 class LevelScreen extends StatefulWidget {
@@ -214,13 +215,29 @@ class _LevelScreenState extends State<LevelScreen> {
                       compact: true,
                     ),
                     const SizedBox(height: 12),
-                    Text(
-                      'Ход: ${snap.selectedGuest ?? '—'}',
-                      style: const TextStyle(
-                        fontFamily: 'PressStart2P',
-                        fontSize: 11,
-                        color: PoliColors.robocarRed,
-                      ),
+                    Row(
+                      children: [
+                        RobocarAvatar(
+                          character: widget.controller
+                              .characterForGuest(snap.selectedGuest),
+                          size: 44,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            snap.selectedGuest == null
+                                ? 'Ход: —'
+                                : widget.controller
+                                    .labelForGuest(snap.selectedGuest!),
+                            style: const TextStyle(
+                              fontFamily: 'PressStart2P',
+                              fontSize: 10,
+                              height: 1.4,
+                              color: PoliColors.robocarRed,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     const Spacer(),
                     if (showQuestion) ...[

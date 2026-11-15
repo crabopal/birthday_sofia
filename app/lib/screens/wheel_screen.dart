@@ -4,6 +4,7 @@ import '../controllers/game_controller.dart';
 import '../theme/app_theme.dart';
 import '../wheel/wheel_widget.dart';
 import '../widgets/pixel_scaffold.dart';
+import '../widgets/robocar_avatar.dart';
 import '../widgets/tv_button.dart';
 
 class WheelScreen extends StatefulWidget {
@@ -76,8 +77,17 @@ class _WheelScreenState extends State<WheelScreen>
                 builder: (context, turns, _) {
                   return ParticipantWheel(
                     names: names,
+                    labels: [
+                      for (final n in names)
+                        widget.controller.characterForGuest(n)?.displayNameRu ??
+                            n,
+                    ],
                     rotationTurns: turns,
-                    winner: _winner,
+                    winner: _winner == null
+                        ? null
+                        : widget.controller.labelForGuest(_winner!),
+                    winnerAvatar:
+                        widget.controller.characterForGuest(_winner),
                   );
                 },
               ),
@@ -111,14 +121,26 @@ class _WheelScreenState extends State<WheelScreen>
                             onPressed: _spinning ? null : _spin,
                           )
                         else ...[
-                          Text(
-                            'Ход: $_winner',
-                            style: const TextStyle(
-                              fontFamily: 'PressStart2P',
-                              fontSize: 14,
-                              color: PoliColors.robocarRed,
-                              height: 1.5,
-                            ),
+                          Row(
+                            children: [
+                              RobocarAvatar(
+                                character: widget.controller
+                                    .characterForGuest(_winner),
+                                size: 56,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  'Ход:\n${widget.controller.labelForGuest(_winner!)}',
+                                  style: const TextStyle(
+                                    fontFamily: 'PressStart2P',
+                                    fontSize: 12,
+                                    color: PoliColors.robocarRed,
+                                    height: 1.5,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 20),
                           TvButton(

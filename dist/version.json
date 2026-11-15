@@ -1,6 +1,6 @@
 {
-  "versionCode": 8,
-  "versionName": "1.2.2",
+  "versionCode": 9,
+  "versionName": "1.2.3",
   "apkUrl": "https://raw.githubusercontent.com/crabopal/birthday_sofia/cursor%2Fsonya-birthday-game-apk-922d/dist/sonya-birthday-release.apk",
-  "notes": "Hide bottom robocars off splash; redraw characters from Poli reference without grid"
+  "notes": "Better robocar sprites from refs; guest avatars Poli→Roy→Amber→Helly"
 }

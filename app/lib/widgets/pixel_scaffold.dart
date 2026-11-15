@@ -155,9 +155,10 @@ class _CharacterStrip extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: const [
-          _CharSprite('assets/images/chars/poli_blue.jpg', 96),
-          _CharSprite('assets/images/chars/amber_pink.jpg', 88),
-          _CharSprite('assets/images/chars/helly_green.jpg', 96),
+          _CharSprite('assets/images/chars/poli.jpg', 84),
+          _CharSprite('assets/images/chars/roy.jpg', 84),
+          _CharSprite('assets/images/chars/amber.jpg', 84),
+          _CharSprite('assets/images/chars/helly.jpg', 84),
         ],
       ),
     );

@@ -2,7 +2,9 @@ import 'dart:math';
 
 import 'package:material_ui/material_ui.dart';
 
+import '../models/robocar_character.dart';
 import '../theme/app_theme.dart';
+import '../widgets/robocar_avatar.dart';
 import 'wheel_spin.dart';
 
 class ParticipantWheel extends StatelessWidget {
@@ -10,15 +12,20 @@ class ParticipantWheel extends StatelessWidget {
     super.key,
     required this.names,
     required this.rotationTurns,
+    this.labels,
     this.winner,
+    this.winnerAvatar,
   });
 
   final List<String> names;
+  final List<String>? labels;
   final double rotationTurns;
   final String? winner;
+  final RobocarCharacter? winnerAvatar;
 
   @override
   Widget build(BuildContext context) {
+    final segmentLabels = labels ?? names;
     return AspectRatio(
       aspectRatio: 1,
       child: Stack(
@@ -27,7 +34,7 @@ class ParticipantWheel extends StatelessWidget {
           Transform.rotate(
             angle: rotationTurns * 2 * pi,
             child: CustomPaint(
-              painter: _WheelPainter(names: names),
+              painter: _WheelPainter(names: segmentLabels),
               child: const SizedBox.expand(),
             ),
           ),
@@ -45,19 +52,28 @@ class ParticipantWheel extends StatelessWidget {
               bottom: 12,
               child: Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
                   color: PoliColors.panel.withValues(alpha: 0.95),
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(color: PoliColors.robocarRed, width: 3),
                 ),
-                child: Text(
-                  winner!,
-                  style: const TextStyle(
-                    fontFamily: 'PressStart2P',
-                    fontSize: 14,
-                    color: PoliColors.robocarRed,
-                  ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (winnerAvatar != null) ...[
+                      RobocarAvatar(character: winnerAvatar, size: 40),
+                      const SizedBox(width: 10),
+                    ],
+                    Text(
+                      winner!,
+                      style: const TextStyle(
+                        fontFamily: 'PressStart2P',
+                        fontSize: 11,
+                        color: PoliColors.robocarRed,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

@@ -3,6 +3,7 @@ import 'package:material_ui/material_ui.dart';
 import '../controllers/game_controller.dart';
 import '../theme/app_theme.dart';
 import '../widgets/pixel_scaffold.dart';
+import '../widgets/robocar_avatar.dart';
 import '../widgets/tv_button.dart';
 
 class LobbyScreen extends StatefulWidget {
@@ -178,12 +179,19 @@ class _LobbyScreenState extends State<LobbyScreen> {
                                     ),
                                     child: Row(
                                       children: [
+                                        RobocarAvatar(
+                                          character: widget.controller
+                                              .characterForGuest(name),
+                                          size: 48,
+                                        ),
+                                        const SizedBox(width: 12),
                                         Expanded(
                                           child: Text(
-                                            name,
+                                            widget.controller.labelForGuest(name),
                                             style: const TextStyle(
                                               fontFamily: 'PressStart2P',
-                                              fontSize: 12,
+                                              fontSize: 10,
+                                              height: 1.4,
                                               color: PoliColors.ink,
                                             ),
                                           ),

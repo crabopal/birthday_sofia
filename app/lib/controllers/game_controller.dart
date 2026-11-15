@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../models/game_state.dart';
 import '../models/level.dart';
+import '../models/robocar_character.dart';
 import '../services/level_pack_store.dart';
 import '../services/music_service.dart';
 import '../services/voice_service.dart';
@@ -37,10 +38,30 @@ class GameController extends ChangeNotifier {
   /// Names currently drawn on the wheel (may shrink as people are picked).
   List<String> wheelNames = const [];
 
+  /// Guest display name → robocar character id.
+  Map<String, String> guestCharacters = const {};
+
   GameSnapshot get snapshot => _snapshot;
   LevelsPack? get pack => _pack;
   VoiceService get voice => _voice;
   FairQueue get queue => _queue;
+
+  RobocarCharacter? characterForGuest(String? guest) {
+    if (guest == null) return null;
+    final id = guestCharacters[guest];
+    if (id == null) return null;
+    return robocarById(id);
+  }
+
+  String labelForGuest(String guest) {
+    final c = characterForGuest(guest);
+    if (c == null) return guest;
+    return c.labelForGuest(guest);
+  }
+
+  void _reassignCharacters() {
+    guestCharacters = assignRobocarsToGuests(_snapshot.guests);
+  }
 
   Future<void> ensureMusic() => music.start();
 
@@ -103,6 +124,7 @@ class GameController extends ChangeNotifier {
     final next = [..._snapshot.guests, trimmed];
     _queue.setGuests(next);
     _snapshot = _snapshot.copyWith(guests: next);
+    _reassignCharacters();
     notifyListeners();
   }
 
@@ -110,6 +132,7 @@ class GameController extends ChangeNotifier {
     final next = _snapshot.guests.where((g) => g != name).toList();
     _queue.setGuests(next);
     _snapshot = _snapshot.copyWith(guests: next);
+    _reassignCharacters();
     notifyListeners();
   }
 
@@ -117,6 +140,7 @@ class GameController extends ChangeNotifier {
     if (_snapshot.guests.length < 2) return;
     if (playableLevels.isEmpty) return;
     music.setMenuVolume();
+    _reassignCharacters();
     _queue.setGuests(_snapshot.guests);
     _snapshot = _snapshot.copyWith(
       phase: GamePhase.progress,
@@ -228,6 +252,7 @@ class GameController extends ChangeNotifier {
       lastFeedback: null,
     );
     wheelNames = const [];
+    guestCharacters = const {};
     _queue.setGuests(const []);
     notifyListeners();
   }
