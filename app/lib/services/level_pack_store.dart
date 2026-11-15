@@ -41,10 +41,11 @@ class LevelPackStore {
     final file = await packFile;
     if (await file.exists()) {
       final json = jsonDecode(await file.readAsString()) as Map<String, dynamic>;
-      return _ensureSeventeen(LevelsPack.fromJson(json));
+      final migrated = _migrateCommaSlot(LevelsPack.fromJson(json));
+      return _ensureLetterSlots(migrated);
     }
     final bundled = await _loadBundled();
-    final ensured = _ensureSeventeen(bundled);
+    final ensured = _ensureLetterSlots(bundled);
     await save(ensured);
     return ensured;
   }
@@ -54,8 +55,45 @@ class LevelPackStore {
     return LevelsPack.fromJson(jsonDecode(raw) as Map<String, dynamic>);
   }
 
-  /// Always 17 letter slots; keeps existing content, fills gaps with stubs.
-  LevelsPack _ensureSeventeen(LevelsPack pack) {
+  static final LevelDefinition bundledCommaLevel = LevelDefinition(
+    id: 'L14',
+    letterIndex: PhraseLayout.commaLetterIndex,
+    type: LevelType.minigame,
+    title: 'Экстра · Соник спасает Пости',
+    question: 'Соник в городе робокаров — спаси Пости из лап Эггмана!',
+    answer: 'sonic',
+    acceptedAnswers: const ['sonic'],
+    ready: true,
+    extra: true,
+    voiceLines: const {'start': 'assets/audio/voice/level_start.wav'},
+  );
+
+  /// Old packs had 17 letters (comma decorative). Shift СОНЯ up and insert comma.
+  LevelsPack _migrateCommaSlot(LevelsPack pack) {
+    final hasComma = pack.levels.any(
+      (l) =>
+          l.letterIndex == PhraseLayout.commaLetterIndex &&
+          (l.extra || l.type == LevelType.minigame),
+    );
+    if (hasComma) return pack;
+    final maxIdx = pack.levels.fold<int>(
+      -1,
+      (m, l) => l.letterIndex > m ? l.letterIndex : m,
+    );
+    // Only migrate classic 0..16 packs.
+    if (maxIdx != 16 || pack.levels.length < 17) return pack;
+    final shifted = [
+      for (final l in pack.levels)
+        if (l.letterIndex >= PhraseLayout.commaLetterIndex)
+          l.copyWith(letterIndex: l.letterIndex + 1)
+        else
+          l,
+    ];
+    return pack.copyWith(levels: shifted);
+  }
+
+  /// Always one slot per phrase letter (incl. comma); keeps content, fills stubs.
+  LevelsPack _ensureLetterSlots(LevelsPack pack) {
     final byLetter = <int, LevelDefinition>{
       for (final l in pack.levels) l.letterIndex: l,
     };
@@ -64,6 +102,8 @@ class LevelPackStore {
       final existing = byLetter[i];
       if (existing != null) {
         levels.add(existing);
+      } else if (i == PhraseLayout.commaLetterIndex) {
+        levels.add(bundledCommaLevel);
       } else {
         final letter = PhraseLayout.letters[i];
         levels.add(

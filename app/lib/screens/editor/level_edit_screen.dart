@@ -198,12 +198,11 @@ class _LevelEditScreenState extends State<LevelEditScreen> {
                     runSpacing: 8,
                     children: [
                       for (final t in LevelType.values)
-                        if (t != LevelType.minigame)
-                          TvButton(
-                            label: LevelDefinition.typeLabel(t).toUpperCase(),
-                            primary: _type == t,
-                            onPressed: () => setState(() => _type = t),
-                          ),
+                        TvButton(
+                          label: LevelDefinition.typeLabel(t).toUpperCase(),
+                          primary: _type == t,
+                          onPressed: () => setState(() => _type = t),
+                        ),
                     ],
                   ),
                 ],

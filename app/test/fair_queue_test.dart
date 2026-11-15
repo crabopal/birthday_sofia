@@ -25,4 +25,17 @@ void main() {
     expect(queue.remaining.length, 3);
     expect(queue.remaining.contains(winner), isFalse);
   });
+
+  test('extra spin uses full pool without depleting fair circle', () {
+    final queue = FairQueue(random: Random(7));
+    queue.setGuests(['A', 'B', 'C']);
+    queue.next(); // deplete one from fair circle
+    expect(queue.remaining.length, 2);
+    final before = List<String>.from(queue.remaining);
+    final all = queue.peekAllNames();
+    expect(all.toSet(), {'A', 'B', 'C'});
+    final pick = queue.nextFromPool();
+    expect(all.contains(pick), isTrue);
+    expect(queue.remaining, before);
+  });
 }

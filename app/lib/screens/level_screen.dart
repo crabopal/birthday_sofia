@@ -1,8 +1,13 @@
+import 'dart:ui' as ui;
+
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/services.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:video_player/video_player.dart';
 
 import '../controllers/game_controller.dart';
+import '../minigames/sonic_rescue/sonic_rescue_game.dart';
+import '../models/game_state.dart';
 import '../models/level.dart';
 import '../services/media_resolver.dart';
 import '../theme/app_theme.dart';
@@ -29,6 +34,8 @@ class _LevelScreenState extends State<LevelScreen> {
   bool _mediaReady = false;
   bool _videoPausedForQuestion = false;
   bool _submitting = false;
+  bool _minigameFinishing = false;
+  ui.Image? _postyImage;
   late final MediaResolver _resolver;
 
   LevelDefinition? get level => widget.controller.currentLevel;
@@ -37,7 +44,7 @@ class _LevelScreenState extends State<LevelScreen> {
   void initState() {
     super.initState();
     _resolver = MediaResolver(widget.controller.store);
-    // Duck theme under the whole level (video / audio / TTS).
+    // Duck theme under the whole level (video / audio / TTS / minigame).
     widget.controller.music.duck();
     _initMedia();
   }
@@ -52,6 +59,13 @@ class _LevelScreenState extends State<LevelScreen> {
   Future<void> _initMedia() async {
     final lvl = level;
     if (lvl == null) return;
+
+    if (lvl.type == LevelType.minigame) {
+      await _loadPosty();
+      if (mounted) setState(() => _mediaReady = true);
+      await _speakQuestion(lvl.question);
+      return;
+    }
 
     if (lvl.type == LevelType.videoQuestion && lvl.videoAsset != null) {
       final controller = await _resolver.openVideo(lvl.videoAsset);
@@ -86,6 +100,17 @@ class _LevelScreenState extends State<LevelScreen> {
     } else {
       if (mounted) setState(() => _mediaReady = true);
       await _speakQuestion(lvl.question);
+    }
+  }
+
+  Future<void> _loadPosty() async {
+    try {
+      final data = await rootBundle.load('assets/images/chars/posty.jpg');
+      final codec = await ui.instantiateImageCodec(data.buffer.asUint8List());
+      final frame = await codec.getNextFrame();
+      _postyImage = frame.image;
+    } catch (_) {
+      _postyImage = null;
     }
   }
 
@@ -132,6 +157,14 @@ class _LevelScreenState extends State<LevelScreen> {
     }
   }
 
+  Future<void> _onMinigameWon() async {
+    if (_minigameFinishing) return;
+    _minigameFinishing = true;
+    await widget.controller.completeCurrentLevel(feedback: 'Пости спасён!');
+    await Future<void>.delayed(const Duration(milliseconds: 1100));
+    if (mounted) widget.controller.advanceAfterCorrect();
+  }
+
   @override
   void dispose() {
     _video?.removeListener(_onVideoTick);
@@ -139,6 +172,7 @@ class _LevelScreenState extends State<LevelScreen> {
     _audio?.dispose();
     _answerController.dispose();
     _answerFocus.dispose();
+    _postyImage?.dispose();
     widget.controller.voice.stopAll();
     widget.controller.music.unduck();
     super.dispose();
@@ -160,6 +194,10 @@ class _LevelScreenState extends State<LevelScreen> {
         showCharacters: false,
         child: Center(child: Text('Нет уровня')),
       );
+    }
+
+    if (lvl.type == LevelType.minigame) {
+      return _minigameBody(lvl, snap);
     }
 
     final showQuestion = lvl.type != LevelType.videoQuestion ||
@@ -219,30 +257,7 @@ class _LevelScreenState extends State<LevelScreen> {
                       compact: true,
                     ),
                     const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        RobocarAvatar(
-                          character: widget.controller
-                              .characterForGuest(snap.selectedGuest),
-                          size: 44,
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            snap.selectedGuest == null
-                                ? 'Ход: —'
-                                : widget.controller
-                                    .labelForGuest(snap.selectedGuest!),
-                            style: const TextStyle(
-                              fontFamily: 'PressStart2P',
-                              fontSize: 10,
-                              height: 1.4,
-                              color: PoliColors.robocarRed,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                    _guestRow(snap),
                     const Spacer(),
                     if (showQuestion) ...[
                       TextField(
@@ -291,7 +306,8 @@ class _LevelScreenState extends State<LevelScreen> {
                           style: TextStyle(
                             fontFamily: 'PressStart2P',
                             fontSize: 12,
-                            color: snap.lastFeedback == 'Верно!'
+                            color: snap.lastFeedback == 'Верно!' ||
+                                    snap.lastFeedback == 'Пости спасён!'
                                 ? PoliColors.mint
                                 : PoliColors.robocarRed,
                           ),
@@ -317,6 +333,81 @@ class _LevelScreenState extends State<LevelScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _minigameBody(LevelDefinition lvl, GameSnapshot snap) {
+    return PixelScaffold(
+      title: lvl.title,
+      showCharacters: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: LetterProgressView(
+                    completedLetters: snap.completedLetters,
+                    currentLetterIndex: lvl.letterIndex,
+                    compact: true,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                SizedBox(width: 220, child: _guestRow(snap)),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Expanded(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: PoliColors.hellyBlue, width: 3),
+                  color: const Color(0xFF0D47A1),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(11),
+                  child: _mediaReady
+                      ? SonicRescueGame(
+                          postyImage: _postyImage,
+                          onWon: _onMinigameWon,
+                        )
+                      : const Center(
+                          child: CircularProgressIndicator(
+                            color: PoliColors.amberYellow,
+                          ),
+                        ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _guestRow(GameSnapshot snap) {
+    return Row(
+      children: [
+        RobocarAvatar(
+          character: widget.controller.characterForGuest(snap.selectedGuest),
+          size: 44,
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            snap.selectedGuest == null
+                ? 'Ход: —'
+                : widget.controller.labelForGuest(snap.selectedGuest!),
+            style: const TextStyle(
+              fontFamily: 'PressStart2P',
+              fontSize: 10,
+              height: 1.4,
+              color: PoliColors.robocarRed,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -388,12 +479,7 @@ class _LevelScreenState extends State<LevelScreen> {
           ),
         );
       case LevelType.minigame:
-        return const Center(
-          child: Text(
-            'Мини-игра — скоро',
-            style: TextStyle(fontFamily: 'PressStart2P', fontSize: 14),
-          ),
-        );
+        return const SizedBox.shrink();
     }
   }
 }

@@ -159,6 +159,8 @@ class GameController extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool get currentLevelIsExtra => currentLevel?.extra == true;
+
   Future<void> continueFromProgress() async {
     if (!hasMoreLevels) {
       _snapshot = _snapshot.copyWith(phase: GamePhase.demoDone);
@@ -168,7 +170,10 @@ class GameController extends ChangeNotifier {
     }
     // Keep full menu bed while the wheel spins (no gameplay duck).
     await music.setMenuVolume();
-    wheelNames = _queue.peekWheelNames();
+    // Secret «экстра» levels draw from the full guest pool.
+    wheelNames = currentLevelIsExtra
+        ? _queue.peekAllNames()
+        : _queue.peekWheelNames();
     _snapshot = _snapshot.copyWith(
       phase: GamePhase.wheel,
       clearSelectedGuest: true,
@@ -180,8 +185,9 @@ class GameController extends ChangeNotifier {
   Future<({String winner, int index})> prepareSpin() async {
     await music.setMenuVolume();
     await _voice.playKey('spin');
-    wheelNames = _queue.peekWheelNames();
-    final winner = _queue.next();
+    final extra = currentLevelIsExtra;
+    wheelNames = extra ? _queue.peekAllNames() : _queue.peekWheelNames();
+    final winner = extra ? _queue.nextFromPool() : _queue.next();
     final index = wheelNames.indexOf(winner).clamp(0, wheelNames.length - 1);
     notifyListeners();
     return (winner: winner, index: index);
@@ -251,19 +257,26 @@ class GameController extends ChangeNotifier {
     if (level == null) return false;
     final ok = level.matchesAnswer(answer);
     if (ok) {
-      final completed = {..._snapshot.completedLetters, level.letterIndex};
-      _snapshot = _snapshot.copyWith(
-        completedLetters: completed,
-        lastFeedback: 'Верно!',
-      );
-      notifyListeners();
-      await _voice.playKey('correct');
+      await completeCurrentLevel(feedback: 'Верно!');
     } else {
       _snapshot = _snapshot.copyWith(lastFeedback: 'Неверно, попробуйте ещё');
       notifyListeners();
       await _voice.playKey('wrong');
     }
     return ok;
+  }
+
+  /// Marks the current letter done (quiz or mini-game win).
+  Future<void> completeCurrentLevel({String feedback = 'Верно!'}) async {
+    final level = currentLevel;
+    if (level == null) return;
+    final completed = {..._snapshot.completedLetters, level.letterIndex};
+    _snapshot = _snapshot.copyWith(
+      completedLetters: completed,
+      lastFeedback: feedback,
+    );
+    notifyListeners();
+    await _voice.playKey('correct');
   }
 
   void advanceAfterCorrect() {

@@ -64,8 +64,9 @@ class _WheelScreenState extends State<WheelScreen>
         ? widget.controller.wheelNames
         : widget.controller.snapshot.guests;
 
+    final extra = widget.controller.currentLevelIsExtra;
     return PixelScaffold(
-      title: 'КТО ИГРАЕТ?',
+      title: extra ? 'ЭКСТРА · КТО ИГРАЕТ?' : 'КТО ИГРАЕТ?',
       child: Padding(
         padding: const EdgeInsets.all(24),
         child: Row(

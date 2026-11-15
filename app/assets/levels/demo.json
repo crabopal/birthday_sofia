@@ -15,10 +15,16 @@
       "title": "Буква С",
       "question": "Какой цвет у главного робокара-спасателя?",
       "answer": "красный",
-      "acceptedAnswers": ["красный", "красныи", "red"],
+      "acceptedAnswers": [
+        "красный",
+        "красныи",
+        "red"
+      ],
       "ready": true,
       "imageAsset": "assets/images/demo_car.png",
-      "voiceLines": { "start": "assets/audio/voice/level_start.wav" }
+      "voiceLines": {
+        "start": "assets/audio/voice/level_start.wav"
+      }
     },
     {
       "id": "L2",
@@ -27,11 +33,18 @@
       "title": "Буква Д",
       "question": "Какое английское слово было на экране жёлтым?",
       "answer": "VIDEO",
-      "acceptedAnswers": ["VIDEO", "video", "VIDEO DEMO", "video demo"],
+      "acceptedAnswers": [
+        "VIDEO",
+        "video",
+        "VIDEO DEMO",
+        "video demo"
+      ],
       "ready": true,
       "videoAsset": "assets/video/demo_question.mp4",
       "pauseAtMs": 3000,
-      "voiceLines": { "start": "assets/audio/voice/level_start.wav" }
+      "voiceLines": {
+        "start": "assets/audio/voice/level_start.wav"
+      }
     },
     {
       "id": "L3",
@@ -40,10 +53,15 @@
       "title": "Буква Н",
       "question": "Сколько нот прозвучало в мелодии?",
       "answer": "3",
-      "acceptedAnswers": ["3", "три"],
+      "acceptedAnswers": [
+        "3",
+        "три"
+      ],
       "ready": true,
       "audioAsset": "assets/audio/demo_question.wav",
-      "voiceLines": { "start": "assets/audio/voice/level_start.wav" }
+      "voiceLines": {
+        "start": "assets/audio/voice/level_start.wav"
+      }
     },
     {
       "id": "L4",
@@ -52,7 +70,12 @@
       "title": "Буква Е",
       "question": "Контент ещё не заполнен. Ответ: далее",
       "answer": "далее",
-      "acceptedAnswers": ["далее", "дальше", "ok", "ок"],
+      "acceptedAnswers": [
+        "далее",
+        "дальше",
+        "ok",
+        "ок"
+      ],
       "ready": false
     },
     {
@@ -62,7 +85,12 @@
       "title": "Буква М",
       "question": "Контент ещё не заполнен. Ответ: далее",
       "answer": "далее",
-      "acceptedAnswers": ["далее", "дальше", "ok", "ок"],
+      "acceptedAnswers": [
+        "далее",
+        "дальше",
+        "ok",
+        "ок"
+      ],
       "ready": false
     },
     {
@@ -72,7 +100,12 @@
       "title": "Буква Р",
       "question": "Контент ещё не заполнен. Ответ: далее",
       "answer": "далее",
-      "acceptedAnswers": ["далее", "дальше", "ok", "ок"],
+      "acceptedAnswers": [
+        "далее",
+        "дальше",
+        "ok",
+        "ок"
+      ],
       "ready": false
     },
     {
@@ -82,7 +115,12 @@
       "title": "Буква О",
       "question": "Контент ещё не заполнен. Ответ: далее",
       "answer": "далее",
-      "acceptedAnswers": ["далее", "дальше", "ok", "ок"],
+      "acceptedAnswers": [
+        "далее",
+        "дальше",
+        "ok",
+        "ок"
+      ],
       "ready": false
     },
     {
@@ -92,7 +130,12 @@
       "title": "Буква Ж",
       "question": "Контент ещё не заполнен. Ответ: далее",
       "answer": "далее",
-      "acceptedAnswers": ["далее", "дальше", "ok", "ок"],
+      "acceptedAnswers": [
+        "далее",
+        "дальше",
+        "ok",
+        "ок"
+      ],
       "ready": false
     },
     {
@@ -102,7 +145,12 @@
       "title": "Буква Д",
       "question": "Контент ещё не заполнен. Ответ: далее",
       "answer": "далее",
-      "acceptedAnswers": ["далее", "дальше", "ok", "ок"],
+      "acceptedAnswers": [
+        "далее",
+        "дальше",
+        "ok",
+        "ок"
+      ],
       "ready": false
     },
     {
@@ -112,7 +160,12 @@
       "title": "Буква Е",
       "question": "Контент ещё не заполнен. Ответ: далее",
       "answer": "далее",
-      "acceptedAnswers": ["далее", "дальше", "ok", "ок"],
+      "acceptedAnswers": [
+        "далее",
+        "дальше",
+        "ok",
+        "ок"
+      ],
       "ready": false
     },
     {
@@ -122,7 +175,12 @@
       "title": "Буква Н",
       "question": "Контент ещё не заполнен. Ответ: далее",
       "answer": "далее",
-      "acceptedAnswers": ["далее", "дальше", "ok", "ок"],
+      "acceptedAnswers": [
+        "далее",
+        "дальше",
+        "ok",
+        "ок"
+      ],
       "ready": false
     },
     {
@@ -132,7 +190,12 @@
       "title": "Буква И",
       "question": "Контент ещё не заполнен. Ответ: далее",
       "answer": "далее",
-      "acceptedAnswers": ["далее", "дальше", "ok", "ок"],
+      "acceptedAnswers": [
+        "далее",
+        "дальше",
+        "ok",
+        "ок"
+      ],
       "ready": false
     },
     {
@@ -142,47 +205,88 @@
       "title": "Буква Я",
       "question": "Контент ещё не заполнен. Ответ: далее",
       "answer": "далее",
-      "acceptedAnswers": ["далее", "дальше", "ok", "ок"],
+      "acceptedAnswers": [
+        "далее",
+        "дальше",
+        "ok",
+        "ок"
+      ],
       "ready": false
     },
     {
       "id": "L14",
       "letterIndex": 13,
-      "type": "picture_question",
-      "title": "Буква С",
-      "question": "Контент ещё не заполнен. Ответ: далее",
-      "answer": "далее",
-      "acceptedAnswers": ["далее", "дальше", "ok", "ок"],
-      "ready": false
+      "type": "minigame",
+      "title": "Экстра · Соник спасает Пости",
+      "question": "Соник в городе робокаров — спаси Пости из лап Эггмана!",
+      "answer": "sonic",
+      "acceptedAnswers": [
+        "sonic"
+      ],
+      "ready": true,
+      "extra": true,
+      "voiceLines": {
+        "start": "assets/audio/voice/level_start.wav"
+      }
     },
     {
       "id": "L15",
       "letterIndex": 14,
       "type": "picture_question",
-      "title": "Буква О",
+      "title": "Буква С",
       "question": "Контент ещё не заполнен. Ответ: далее",
       "answer": "далее",
-      "acceptedAnswers": ["далее", "дальше", "ok", "ок"],
+      "acceptedAnswers": [
+        "далее",
+        "дальше",
+        "ok",
+        "ок"
+      ],
       "ready": false
     },
     {
       "id": "L16",
       "letterIndex": 15,
       "type": "picture_question",
-      "title": "Буква Н",
+      "title": "Буква О",
       "question": "Контент ещё не заполнен. Ответ: далее",
       "answer": "далее",
-      "acceptedAnswers": ["далее", "дальше", "ok", "ок"],
+      "acceptedAnswers": [
+        "далее",
+        "дальше",
+        "ok",
+        "ок"
+      ],
       "ready": false
     },
     {
       "id": "L17",
       "letterIndex": 16,
       "type": "picture_question",
+      "title": "Буква Н",
+      "question": "Контент ещё не заполнен. Ответ: далее",
+      "answer": "далее",
+      "acceptedAnswers": [
+        "далее",
+        "дальше",
+        "ok",
+        "ок"
+      ],
+      "ready": false
+    },
+    {
+      "id": "L18",
+      "letterIndex": 17,
+      "type": "picture_question",
       "title": "Буква Я",
       "question": "Контент ещё не заполнен. Ответ: далее",
       "answer": "далее",
-      "acceptedAnswers": ["далее", "дальше", "ok", "ок"],
+      "acceptedAnswers": [
+        "далее",
+        "дальше",
+        "ok",
+        "ок"
+      ],
       "ready": false
     }
   ]

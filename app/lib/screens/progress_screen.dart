@@ -24,9 +24,8 @@ class ProgressScreen extends StatelessWidget {
     final snap = controller.snapshot;
     final level = controller.currentLevel;
     final letterIndex = level?.letterIndex ?? snap.currentLevelIndex;
-    final letter = letterIndex < PhraseLayout.letters.length
-        ? PhraseLayout.letters[letterIndex]
-        : '?';
+    final levelLabel = PhraseLayout.displayTitleForLetter(letterIndex);
+    final isExtra = level?.extra == true;
 
     return PixelScaffold(
       title: 'ПРОГРЕСС',
@@ -41,13 +40,24 @@ class ProgressScreen extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               Text(
-                'Уровень: буква «$letter»',
+                'Уровень: $levelLabel',
                 style: const TextStyle(
                   fontFamily: 'PressStart2P',
                   fontSize: 12,
                   color: PoliColors.ink,
                 ),
               ),
+              if (isExtra) ...[
+                const SizedBox(height: 10),
+                const Text(
+                  'Гость — из всего пула',
+                  style: TextStyle(
+                    fontFamily: 'PressStart2P',
+                    fontSize: 9,
+                    color: PoliColors.hellyBlue,
+                  ),
+                ),
+              ],
               if (level != null) ...[
                 const SizedBox(height: 12),
                 Text(

@@ -15,6 +15,7 @@ class LevelDefinition {
     required this.answer,
     required this.acceptedAnswers,
     this.ready = false,
+    this.extra = false,
     this.imageAsset,
     this.videoAsset,
     this.audioAsset,
@@ -30,6 +31,9 @@ class LevelDefinition {
   final String answer;
   final List<String> acceptedAnswers;
   final bool ready;
+
+  /// Secret «экстра»: wheel draws from the full guest pool (not fair remainder).
+  final bool extra;
   final String? imageAsset;
   final String? videoAsset;
   final String? audioAsset;
@@ -49,6 +53,7 @@ class LevelDefinition {
               .toList() ??
           [(json['answer'] as String?) ?? ''],
       ready: json['ready'] as bool? ?? false,
+      extra: json['extra'] as bool? ?? false,
       imageAsset: json['imageAsset'] as String?,
       videoAsset: json['videoAsset'] as String?,
       audioAsset: json['audioAsset'] as String?,
@@ -69,6 +74,7 @@ class LevelDefinition {
         'answer': answer,
         'acceptedAnswers': acceptedAnswers,
         'ready': ready,
+        if (extra) 'extra': true,
         if (imageAsset != null) 'imageAsset': imageAsset,
         if (videoAsset != null) 'videoAsset': videoAsset,
         if (audioAsset != null) 'audioAsset': audioAsset,
@@ -85,6 +91,7 @@ class LevelDefinition {
     String? answer,
     List<String>? acceptedAnswers,
     bool? ready,
+    bool? extra,
     String? imageAsset,
     String? videoAsset,
     String? audioAsset,
@@ -104,6 +111,7 @@ class LevelDefinition {
       answer: answer ?? this.answer,
       acceptedAnswers: acceptedAnswers ?? this.acceptedAnswers,
       ready: ready ?? this.ready,
+      extra: extra ?? this.extra,
       imageAsset: clearImage ? null : (imageAsset ?? this.imageAsset),
       videoAsset: clearVideo ? null : (videoAsset ?? this.videoAsset),
       audioAsset: clearAudio ? null : (audioAsset ?? this.audioAsset),

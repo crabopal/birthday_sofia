@@ -145,7 +145,11 @@ class _EditorHomeScreenState extends State<EditorHomeScreen> {
         itemCount: levels.length,
         itemBuilder: (context, index) {
           final level = levels[index];
-          final letter = PhraseLayout.letters[level.letterIndex];
+          final letter = level.letterIndex >= 0 &&
+                  level.letterIndex < PhraseLayout.letters.length
+              ? PhraseLayout.letters[level.letterIndex]
+              : '?';
+          final letterLabel = letter == ',' ? 'Extr' : letter;
           return Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: Material(
@@ -168,10 +172,10 @@ class _EditorHomeScreenState extends State<EditorHomeScreen> {
                   child: Row(
                     children: [
                       Text(
-                        letter,
+                        letterLabel,
                         style: TextStyle(
                           fontFamily: 'PressStart2P',
-                          fontSize: 16,
+                          fontSize: letter == ',' ? 10 : 16,
                           color: level.ready
                               ? PoliColors.beaconYellow
                               : PoliColors.steel,
