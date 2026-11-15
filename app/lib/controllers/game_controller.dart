@@ -17,7 +17,11 @@ class GameController extends ChangeNotifier {
   })  : store = store ?? LevelPackStore(),
         _queue = queue ?? FairQueue(),
         music = music ?? MusicService() {
-    _voice = voice ?? VoiceService(store: this.store);
+    _voice = voice ??
+        VoiceService(
+          store: this.store,
+          music: this.music,
+        );
   }
 
   late final VoiceService _voice;

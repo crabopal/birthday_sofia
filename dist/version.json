@@ -1,6 +1,6 @@
 {
-  "versionCode": 12,
-  "versionName": "1.2.6",
+  "versionCode": 13,
+  "versionName": "1.2.7",
   "apkUrl": "https://raw.githubusercontent.com/crabopal/birthday_sofia/cursor%2Fsonya-birthday-game-apk-922d/dist/sonya-birthday-release.apk",
-  "notes": "BGM: instrumental minus of user opening track (no 8-bit crush)"
+  "notes": "Original BGM loop; duck under levels/TTS; lobby focus fix after guests"
 }

@@ -11,6 +11,7 @@ class TvButton extends StatefulWidget {
     this.autofocus = false,
     this.primary = true,
     this.enabled = true,
+    this.focusNode,
   });
 
   final String label;
@@ -18,6 +19,7 @@ class TvButton extends StatefulWidget {
   final bool autofocus;
   final bool primary;
   final bool enabled;
+  final FocusNode? focusNode;
 
   @override
   State<TvButton> createState() => _TvButtonState();
@@ -45,6 +47,7 @@ class _TvButtonState extends State<TvButton> {
     final fg = enabled ? Colors.white : PoliColors.inkSoft;
 
     return FocusableActionDetector(
+      focusNode: widget.focusNode,
       autofocus: widget.autofocus,
       enabled: enabled,
       onShowFocusHighlight: (show) {

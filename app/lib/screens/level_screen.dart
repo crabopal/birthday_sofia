@@ -37,6 +37,8 @@ class _LevelScreenState extends State<LevelScreen> {
   void initState() {
     super.initState();
     _resolver = MediaResolver(widget.controller.store);
+    // Duck theme under the whole level (video / audio / TTS).
+    widget.controller.music.duck();
     _initMedia();
   }
 
@@ -108,6 +110,7 @@ class _LevelScreenState extends State<LevelScreen> {
     if (source == null) return;
     await widget.controller.voice.stopAll();
     await _audio!.stop();
+    // Level already ducks BGM; keep bed quiet while puzzle audio replays.
     await _audio!.play(source);
   }
 
@@ -137,6 +140,7 @@ class _LevelScreenState extends State<LevelScreen> {
     _answerController.dispose();
     _answerFocus.dispose();
     widget.controller.voice.stopAll();
+    widget.controller.music.unduck();
     super.dispose();
   }
 

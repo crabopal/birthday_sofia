@@ -4,13 +4,16 @@ import 'package:flutter_tts/flutter_tts.dart';
 
 import 'media_paths.dart';
 import 'level_pack_store.dart';
+import 'music_service.dart';
 
 /// Plays pre-baked voice / SFX clips and temporary TTS for questions.
 class VoiceService {
-  VoiceService({AudioPlayer? player, this.store}) : _injected = player;
+  VoiceService({AudioPlayer? player, this.store, this.music})
+      : _injected = player;
 
   final AudioPlayer? _injected;
   final LevelPackStore? store;
+  final MusicService? music;
   AudioPlayer? _player;
   FlutterTts? _tts;
   Map<String, String> _globalLines = {};
@@ -34,7 +37,6 @@ class VoiceService {
       final tts = FlutterTts();
       _tts = tts;
       await tts.awaitSpeakCompletion(true);
-      // Prefer Russian; fall back silently if missing on device.
       final langs = await tts.getLanguages;
       if (langs is List && langs.any((l) => l.toString().startsWith('ru'))) {
         await tts.setLanguage('ru-RU');
@@ -85,7 +87,7 @@ class VoiceService {
 
   Future<void> playAsset(String assetPath) => playPath(assetPath);
 
-  /// Speaks [text] with on-device TTS (temporary stand-in for Poli voice).
+  /// Speaks [text] with on-device TTS; ducks BGM while speaking.
   Future<void> speakText(String text) async {
     if (_disabled) return;
     final trimmed = text.trim();
@@ -96,9 +98,12 @@ class VoiceService {
     try {
       await _audio.stop();
       await tts.stop();
+      await music?.duck();
       await tts.speak(trimmed);
     } catch (e) {
       debugPrint('TTS speak failed: $e');
+    } finally {
+      await music?.unduck();
     }
   }
 
