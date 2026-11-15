@@ -21,6 +21,13 @@ void main() {
     expect(find.text('СТАРТ'), findsOneWidget);
     expect(find.text('РЕДАКТОР'), findsOneWidget);
     expect(find.textContaining('СОНЯ'), findsOneWidget);
+
+    await tester.tap(find.text('СТАРТ'));
+    await tester.pump();
+    for (var i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
+    expect(controller.snapshot.phase.toString(), contains('lobby'));
   });
 
   test('demo pack json shape via LevelDefinition', () {

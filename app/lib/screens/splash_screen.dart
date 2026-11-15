@@ -159,11 +159,11 @@ class _SplashScreenState extends State<SplashScreen> {
         _gate == _SplashGate.installing;
 
     return PixelScaffold(
-      showCharacters: true,
+      showCharacters: false,
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 920),
-          child: Padding(
+          constraints: const BoxConstraints(maxWidth: 980),
+          child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 8),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -171,11 +171,13 @@ class _SplashScreenState extends State<SplashScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
-                    _HeroChar('assets/images/chars/poli_red.jpg'),
-                    SizedBox(width: 18),
-                    _HeroChar('assets/images/chars/amber_yellow.jpg'),
-                    SizedBox(width: 18),
-                    _HeroChar('assets/images/chars/helly_blue.jpg'),
+                    _HeroChar('assets/images/chars/poli_blue.jpg'),
+                    SizedBox(width: 14),
+                    _HeroChar('assets/images/chars/amber_pink.jpg'),
+                    SizedBox(width: 14),
+                    _HeroChar('assets/images/chars/roy_red.jpg'),
+                    SizedBox(width: 14),
+                    _HeroChar('assets/images/chars/helly_green.jpg'),
                   ],
                 ),
                 const SizedBox(height: 18),
@@ -330,8 +332,8 @@ class _HeroChar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 108,
-      height: 108,
+      width: 92,
+      height: 92,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white, width: 4),

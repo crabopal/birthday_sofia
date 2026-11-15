@@ -1,7 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 
-import '../input/input_router.dart';
 import '../theme/app_theme.dart';
 
 class TvButton extends StatefulWidget {
@@ -27,6 +26,11 @@ class TvButton extends StatefulWidget {
 class _TvButtonState extends State<TvButton> {
   bool _focused = false;
 
+  void _activate() {
+    if (!widget.enabled || widget.onPressed == null) return;
+    widget.onPressed!();
+  }
+
   @override
   Widget build(BuildContext context) {
     final enabled = widget.enabled && widget.onPressed != null;
@@ -40,19 +44,30 @@ class _TvButtonState extends State<TvButton> {
         : (widget.primary ? const Color(0xFFB71C1C) : const Color(0xFF1565C0));
     final fg = enabled ? Colors.white : PoliColors.inkSoft;
 
-    return Focus(
+    return FocusableActionDetector(
       autofocus: widget.autofocus,
-      onFocusChange: (v) => setState(() => _focused = v),
-      onKeyEvent: (node, event) {
-        if (!enabled) return KeyEventResult.ignored;
-        if (event is KeyDownEvent && InputRouter.isSelect(event)) {
-          widget.onPressed?.call();
-          return KeyEventResult.handled;
-        }
-        return KeyEventResult.ignored;
+      enabled: enabled,
+      onShowFocusHighlight: (show) {
+        if (_focused != show) setState(() => _focused = show);
+      },
+      actions: <Type, Action<Intent>>{
+        ActivateIntent: CallbackAction<ActivateIntent>(
+          onInvoke: (_) {
+            _activate();
+            return null;
+          },
+        ),
+      },
+      shortcuts: const <ShortcutActivator, Intent>{
+        SingleActivator(LogicalKeyboardKey.select): ActivateIntent(),
+        SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
+        SingleActivator(LogicalKeyboardKey.numpadEnter): ActivateIntent(),
+        SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
+        SingleActivator(LogicalKeyboardKey.gameButtonA): ActivateIntent(),
       },
       child: GestureDetector(
-        onTap: enabled ? widget.onPressed : null,
+        behavior: HitTestBehavior.opaque,
+        onTap: enabled ? _activate : null,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 120),
           padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 18),

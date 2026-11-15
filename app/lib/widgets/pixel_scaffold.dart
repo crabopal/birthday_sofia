@@ -1,7 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 
 import '../theme/app_theme.dart';
-import 'scanlines.dart';
 
 /// Full-bleed rescue-city backdrop with optional character decorations.
 class PixelScaffold extends StatelessWidget {
@@ -27,9 +26,11 @@ class PixelScaffold extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           const _CityBackdrop(),
-          if (showCharacters) const _CharacterStrip(),
           if (dimContent)
-            Container(color: Colors.black.withValues(alpha: 0.18)),
+            const IgnorePointer(
+              child: ColoredBox(color: Color(0x2E000000)),
+            ),
+          // Content first so it always receives focus / taps.
           SafeArea(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -63,14 +64,26 @@ class PixelScaffold extends StatelessWidget {
                   ),
                 Expanded(
                   child: Padding(
-                    padding: EdgeInsets.only(bottom: showCharacters ? 100 : 8),
+                    // Leave room for decorative strip without covering controls.
+                    padding: EdgeInsets.only(bottom: showCharacters ? 96 : 8),
                     child: child,
                   ),
                 ),
               ],
             ),
           ),
-          const ScanlinesOverlay(),
+          // Decorative only — never steals focus or pointer events.
+          if (showCharacters)
+            const Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: ExcludeFocus(
+                child: IgnorePointer(
+                  child: _CharacterStrip(),
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -82,10 +95,10 @@ class _CityBackdrop extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
+    return const Stack(
       fit: StackFit.expand,
       children: [
-        const DecoratedBox(
+        DecoratedBox(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
@@ -94,31 +107,39 @@ class _CityBackdrop extends StatelessWidget {
             ),
           ),
         ),
-        Opacity(
-          opacity: 0.55,
-          child: Image.asset(
-            'assets/images/bg/city.jpg',
-            fit: BoxFit.cover,
-            alignment: Alignment.bottomCenter,
-            errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-          ),
-        ),
-        // Soft wash so UI text stays readable
+        _CityImage(),
         DecoratedBox(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Colors.white.withValues(alpha: 0.25),
-                Colors.white.withValues(alpha: 0.55),
-                const Color(0xFFFFF3D6).withValues(alpha: 0.75),
+                Color(0x40FFFFFF),
+                Color(0x8CFFFFFF),
+                Color(0xBFFFF3D6),
               ],
-              stops: const [0.0, 0.45, 1.0],
+              stops: [0.0, 0.45, 1.0],
             ),
           ),
         ),
       ],
+    );
+  }
+}
+
+class _CityImage extends StatelessWidget {
+  const _CityImage();
+
+  @override
+  Widget build(BuildContext context) {
+    return Opacity(
+      opacity: 0.55,
+      child: Image.asset(
+        'assets/images/bg/city.jpg',
+        fit: BoxFit.cover,
+        alignment: Alignment.bottomCenter,
+        errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+      ),
     );
   }
 }
@@ -128,23 +149,16 @@ class _CharacterStrip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      left: 0,
-      right: 0,
-      bottom: 0,
-      child: IgnorePointer(
-        child: SizedBox(
-          height: 110,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: const [
-              _CharSprite('assets/images/chars/poli_red.jpg', 96),
-              _CharSprite('assets/images/chars/amber_yellow.jpg', 88),
-              _CharSprite('assets/images/chars/helly_blue.jpg', 96),
-            ],
-          ),
-        ),
+    return SizedBox(
+      height: 110,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: const [
+          _CharSprite('assets/images/chars/poli_blue.jpg', 96),
+          _CharSprite('assets/images/chars/amber_pink.jpg', 88),
+          _CharSprite('assets/images/chars/helly_green.jpg', 96),
+        ],
       ),
     );
   }
@@ -177,9 +191,14 @@ class _CharSprite extends StatelessWidget {
       child: Image.asset(
         path,
         fit: BoxFit.cover,
+        filterQuality: FilterQuality.none,
         errorBuilder: (_, __, ___) => ColoredBox(
           color: PoliColors.panelDeep,
-          child: Icon(Icons.directions_car, color: PoliColors.robocarRed, size: size * 0.45),
+          child: Icon(
+            Icons.directions_car,
+            color: PoliColors.robocarRed,
+            size: size * 0.45,
+          ),
         ),
       ),
     );
