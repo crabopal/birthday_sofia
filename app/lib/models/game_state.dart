@@ -15,6 +15,8 @@ class GameSnapshot {
     required this.currentLevelIndex,
     required this.selectedGuest,
     required this.lastFeedback,
+    this.lastPlayer,
+    this.justLitLetter,
   });
 
   final GamePhase phase;
@@ -24,6 +26,12 @@ class GameSnapshot {
   final String? selectedGuest;
   final String? lastFeedback;
 
+  /// Guest who just finished a level (shown on progress reactions).
+  final String? lastPlayer;
+
+  /// Letter that should play the light-up ritual on the progress board.
+  final int? justLitLetter;
+
   GameSnapshot copyWith({
     GamePhase? phase,
     List<String>? guests,
@@ -31,8 +39,12 @@ class GameSnapshot {
     int? currentLevelIndex,
     String? selectedGuest,
     String? lastFeedback,
+    String? lastPlayer,
+    int? justLitLetter,
     bool clearSelectedGuest = false,
     bool clearFeedback = false,
+    bool clearLastPlayer = false,
+    bool clearJustLitLetter = false,
   }) {
     return GameSnapshot(
       phase: phase ?? this.phase,
@@ -42,6 +54,9 @@ class GameSnapshot {
       selectedGuest:
           clearSelectedGuest ? null : (selectedGuest ?? this.selectedGuest),
       lastFeedback: clearFeedback ? null : (lastFeedback ?? this.lastFeedback),
+      lastPlayer: clearLastPlayer ? null : (lastPlayer ?? this.lastPlayer),
+      justLitLetter:
+          clearJustLitLetter ? null : (justLitLetter ?? this.justLitLetter),
     );
   }
 }

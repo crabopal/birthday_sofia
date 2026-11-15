@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../models/game_state.dart';
 import '../models/level.dart';
+import '../models/phrase.dart';
 import '../models/robocar_character.dart';
 import '../services/level_pack_store.dart';
 import '../services/music_service.dart';
@@ -38,6 +39,8 @@ class GameController extends ChangeNotifier {
     selectedGuest: null,
     lastFeedback: null,
   );
+
+  int? _pendingLitLetter;
 
   /// Names currently drawn on the wheel (may shrink as people are picked).
   List<String> wheelNames = const [];
@@ -105,6 +108,13 @@ class GameController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// In-memory pack swap for unit tests (skips disk).
+  void debugSetPack(LevelsPack pack) {
+    _pack = pack;
+    _voice.configure(pack.voiceLines);
+    notifyListeners();
+  }
+
   Future<void> updateLevelAtPackIndex(int packIndex, LevelDefinition level) async {
     final pack = _pack;
     if (pack == null) return;
@@ -149,12 +159,15 @@ class GameController extends ChangeNotifier {
     music.setMenuVolume();
     _reassignCharacters();
     _queue.setGuests(_snapshot.guests);
+    _pendingLitLetter = null;
     _snapshot = _snapshot.copyWith(
       phase: GamePhase.progress,
       currentLevelIndex: 0,
       completedLetters: {},
       clearSelectedGuest: true,
       clearFeedback: true,
+      clearLastPlayer: true,
+      clearJustLitLetter: true,
     );
     notifyListeners();
   }
@@ -162,6 +175,7 @@ class GameController extends ChangeNotifier {
   bool get currentLevelIsExtra => currentLevel?.extra == true;
 
   Future<void> continueFromProgress() async {
+    await _voice.stopAll();
     if (!hasMoreLevels) {
       _snapshot = _snapshot.copyWith(phase: GamePhase.demoDone);
       notifyListeners();
@@ -178,6 +192,7 @@ class GameController extends ChangeNotifier {
       phase: GamePhase.wheel,
       clearSelectedGuest: true,
       clearFeedback: true,
+      clearJustLitLetter: true,
     );
     notifyListeners();
   }
@@ -270,6 +285,7 @@ class GameController extends ChangeNotifier {
   Future<void> completeCurrentLevel({String feedback = 'Верно!'}) async {
     final level = currentLevel;
     if (level == null) return;
+    _pendingLitLetter = level.letterIndex;
     final completed = {..._snapshot.completedLetters, level.letterIndex};
     _snapshot = _snapshot.copyWith(
       completedLetters: completed,
@@ -281,11 +297,16 @@ class GameController extends ChangeNotifier {
 
   void advanceAfterCorrect() {
     final nextIndex = _snapshot.currentLevelIndex + 1;
+    final player = _snapshot.selectedGuest;
+    final lit = _pendingLitLetter;
+    _pendingLitLetter = null;
     music.setMenuVolume();
     if (nextIndex >= playableLevels.length) {
       _snapshot = _snapshot.copyWith(
         phase: GamePhase.demoDone,
         currentLevelIndex: nextIndex,
+        lastPlayer: player,
+        justLitLetter: lit,
         clearSelectedGuest: true,
         clearFeedback: true,
       );
@@ -296,14 +317,36 @@ class GameController extends ChangeNotifier {
     _snapshot = _snapshot.copyWith(
       phase: GamePhase.progress,
       currentLevelIndex: nextIndex,
+      lastPlayer: player,
+      justLitLetter: lit,
       clearSelectedGuest: true,
       clearFeedback: true,
     );
     notifyListeners();
   }
 
+  String progressHostLine() {
+    final lit = _snapshot.justLitLetter;
+    final next = currentLevel;
+    if (lit != null) {
+      if (PhraseLayout.isExtraLetter(lit)) {
+        return 'Экстра пройдена! Дальше — круг.';
+      }
+      final ch = PhraseLayout.letters[lit];
+      return 'Буква «$ch» зажглась! Дальше — круг.';
+    }
+    if (next?.extra == true) {
+      return 'Секретная миссия! Гость — из всего пула.';
+    }
+    if (_snapshot.completedLetters.isEmpty) {
+      return 'Соберим поздравление! Крутим круг.';
+    }
+    return 'Готовы к следующей букве? Крутим круг!';
+  }
+
   void restart() {
     music.setMenuVolume();
+    _pendingLitLetter = null;
     _snapshot = const GameSnapshot(
       phase: GamePhase.lobby,
       guests: [],
