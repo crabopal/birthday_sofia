@@ -17,7 +17,7 @@ class RobocarCharacter {
   String labelForGuest(String guestName) => '$displayNameRu ($guestName)';
 }
 
-/// Core four always in the pool, in this order when guest count ≤ 4.
+/// Core four always in the pool, in this order for the first four guests.
 const List<RobocarCharacter> kCoreRobocars = [
   RobocarCharacter(
     id: 'poli',
@@ -102,39 +102,55 @@ RobocarCharacter? robocarById(String id) {
   return null;
 }
 
-/// Assign characters to [guests].
+/// Assign characters to [guests] without reshuffling existing ones.
 ///
-/// • ≤4 guests → fixed core order: Поли, Рой, Эмбер, Хэлли.
-/// • >4 guests → pool = core four + random extras; then shuffled onto guests.
+/// • Guests already in [existing] keep the same character id.
+/// • First four *new* slots (guest index 0..3 with no prior id) get the
+///   fixed core order: Поли → Рой → Эмбер → Хэлли (if still free).
+/// • Later new guests pick a random unused character from the full pool.
+/// • Characters never repeat while still assigned to a current guest.
 Map<String, String> assignRobocarsToGuests(
   List<String> guests, {
+  Map<String, String>? existing,
   Random? random,
 }) {
   final rng = random ?? Random();
-  final n = guests.length;
-  if (n == 0) return {};
-
-  final List<RobocarCharacter> chosen;
-  if (n <= kCoreRobocars.length) {
-    chosen = kCoreRobocars.take(n).toList();
-  } else {
-    final extras = List<RobocarCharacter>.from(kExtraRobocars)..shuffle(rng);
-    final need = n - kCoreRobocars.length;
-    chosen = [
-      ...kCoreRobocars,
-      ...extras.take(need.clamp(0, extras.length)),
-    ];
-    var i = 0;
-    while (chosen.length < n) {
-      chosen.add(extras[i % extras.length]);
-      i++;
-    }
-    chosen.shuffle(rng);
-  }
-
   final map = <String, String>{};
-  for (var i = 0; i < n; i++) {
-    map[guests[i]] = chosen[i].id;
+  final used = <String>{};
+
+  // Keep sticky assignments for guests that are still present.
+  for (final guest in guests) {
+    final prev = existing?[guest];
+    if (prev != null && robocarById(prev) != null && !used.contains(prev)) {
+      map[guest] = prev;
+      used.add(prev);
+    }
   }
+
+  for (var i = 0; i < guests.length; i++) {
+    final guest = guests[i];
+    if (map.containsKey(guest)) continue;
+
+    String? pick;
+    if (i < kCoreRobocars.length) {
+      final coreId = kCoreRobocars[i].id;
+      if (!used.contains(coreId)) pick = coreId;
+    }
+    pick ??= _pickUnused(used, rng);
+    if (pick == null) continue;
+
+    map[guest] = pick;
+    used.add(pick);
+  }
+
   return map;
+}
+
+String? _pickUnused(Set<String> used, Random rng) {
+  final free = kAllRobocars.where((c) => !used.contains(c.id)).toList();
+  if (free.isEmpty) return null;
+  // Prefer extras when available so late guests feel like "bonus" cast.
+  final extrasFree = free.where((c) => !c.core).toList();
+  final pool = extrasFree.isNotEmpty ? extrasFree : free;
+  return pool[rng.nextInt(pool.length)].id;
 }

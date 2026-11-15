@@ -64,7 +64,10 @@ class GameController extends ChangeNotifier {
   }
 
   void _reassignCharacters() {
-    guestCharacters = assignRobocarsToGuests(_snapshot.guests);
+    guestCharacters = assignRobocarsToGuests(
+      _snapshot.guests,
+      existing: guestCharacters,
+    );
   }
 
   Future<void> ensureMusic() => music.start();

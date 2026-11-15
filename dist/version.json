@@ -1,6 +1,6 @@
 {
-  "versionCode": 13,
-  "versionName": "1.2.7",
+  "versionCode": 14,
+  "versionName": "1.2.8",
   "apkUrl": "https://raw.githubusercontent.com/crabopal/birthday_sofia/cursor%2Fsonya-birthday-game-apk-922d/dist/sonya-birthday-release.apk",
-  "notes": "Original BGM loop; duck under levels/TTS; lobby focus fix after guests"
+  "notes": "Sticky guest characters: fixed core first 4, then random unused, no reshuffle"
 }
