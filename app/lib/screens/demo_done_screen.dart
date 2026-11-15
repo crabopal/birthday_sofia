@@ -3,7 +3,7 @@ import 'package:material_ui/material_ui.dart';
 import '../controllers/game_controller.dart';
 import '../theme/app_theme.dart';
 import '../widgets/letter_progress.dart';
-import '../widgets/scanlines.dart';
+import '../widgets/pixel_scaffold.dart';
 import '../widgets/tv_button.dart';
 
 class DemoDoneScreen extends StatelessWidget {
@@ -41,7 +41,7 @@ class DemoDoneScreen extends StatelessWidget {
                 fontFamily: 'PressStart2P',
                 fontSize: 12,
                 height: 1.7,
-                color: PoliColors.cream,
+                color: PoliColors.ink,
               ),
             ),
             const SizedBox(height: 36),

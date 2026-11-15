@@ -6,7 +6,7 @@ import '../../models/phrase.dart';
 import '../../services/media_paths.dart';
 import '../../services/media_upload_server.dart';
 import '../../theme/app_theme.dart';
-import '../../widgets/scanlines.dart';
+import '../../widgets/pixel_scaffold.dart';
 import '../../widgets/tv_button.dart';
 import 'media_library_screen.dart';
 

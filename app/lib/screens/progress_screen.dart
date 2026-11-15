@@ -4,7 +4,7 @@ import '../controllers/game_controller.dart';
 import '../models/phrase.dart';
 import '../theme/app_theme.dart';
 import '../widgets/letter_progress.dart';
-import '../widgets/scanlines.dart';
+import '../widgets/pixel_scaffold.dart';
 import '../widgets/tv_button.dart';
 
 class ProgressScreen extends StatelessWidget {
@@ -31,40 +31,42 @@ class ProgressScreen extends StatelessWidget {
     return PixelScaffold(
       title: 'ПРОГРЕСС',
       child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            LetterProgressView(
-              completedLetters: snap.completedLetters,
-              currentLetterIndex: letterIndex,
-            ),
-            const SizedBox(height: 28),
-            Text(
-              'Уровень: буква «$letter»',
-              style: const TextStyle(
-                fontFamily: 'PressStart2P',
-                fontSize: 12,
-                color: PoliColors.cream,
+        child: PixelPanel(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              LetterProgressView(
+                completedLetters: snap.completedLetters,
+                currentLetterIndex: letterIndex,
               ),
-            ),
-            if (level != null) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: 24),
               Text(
-                level.title,
+                'Уровень: буква «$letter»',
                 style: const TextStyle(
                   fontFamily: 'PressStart2P',
-                  fontSize: 10,
-                  color: PoliColors.steel,
+                  fontSize: 12,
+                  color: PoliColors.ink,
                 ),
               ),
+              if (level != null) ...[
+                const SizedBox(height: 12),
+                Text(
+                  level.title,
+                  style: const TextStyle(
+                    fontFamily: 'PressStart2P',
+                    fontSize: 10,
+                    color: PoliColors.inkSoft,
+                  ),
+                ),
+              ],
+              const SizedBox(height: 28),
+              TvButton(
+                label: 'ДАЛЬШЕ — КРУГ',
+                autofocus: true,
+                onPressed: () => controller.continueFromProgress(),
+              ),
             ],
-            const SizedBox(height: 36),
-            TvButton(
-              label: 'ДАЛЬШЕ — КРУГ',
-              autofocus: true,
-              onPressed: () => controller.continueFromProgress(),
-            ),
-          ],
+          ),
         ),
       ),
     );

@@ -2,7 +2,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../services/app_updater.dart';
 import '../theme/app_theme.dart';
-import '../widgets/scanlines.dart';
+import '../widgets/pixel_scaffold.dart';
 import '../widgets/tv_button.dart';
 
 enum _SplashGate {
@@ -17,10 +17,12 @@ class SplashScreen extends StatefulWidget {
     super.key,
     required this.onStart,
     required this.onEditor,
+    this.onReadyMusic,
   });
 
   final VoidCallback onStart;
   final VoidCallback onEditor;
+  final Future<void> Function()? onReadyMusic;
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -37,6 +39,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+    widget.onReadyMusic?.call();
     _runUpdateFlow();
   }
 
@@ -88,7 +91,8 @@ class _SplashScreenState extends State<SplashScreen> {
           if (!mounted) return;
           setState(() {
             _progress = p;
-            _status = 'Скачивание ${(p * 100).clamp(0, 100).toStringAsFixed(0)}%';
+            _status =
+                'Скачивание ${(p * 100).clamp(0, 100).toStringAsFixed(0)}%';
           });
         },
       );
@@ -128,7 +132,8 @@ class _SplashScreenState extends State<SplashScreen> {
           if (!mounted) return;
           setState(() {
             _progress = p;
-            _status = 'Скачивание ${(p * 100).clamp(0, 100).toStringAsFixed(0)}%';
+            _status =
+                'Скачивание ${(p * 100).clamp(0, 100).toStringAsFixed(0)}%';
           });
         },
       );
@@ -154,136 +159,198 @@ class _SplashScreenState extends State<SplashScreen> {
         _gate == _SplashGate.installing;
 
     return PixelScaffold(
+      showCharacters: true,
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 900),
+          constraints: const BoxConstraints(maxWidth: 920),
           child: Padding(
-            padding: const EdgeInsets.all(32),
+            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 8),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
-                  'С ДНЕМ\nРОЖДЕНИЯ,\nСОНЯ',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontFamily: 'PressStart2P',
-                    fontSize: 36,
-                    height: 1.55,
-                    color: PoliColors.beaconYellow,
-                    shadows: [
-                      Shadow(color: PoliColors.robocarRed, offset: Offset(3, 3)),
-                    ],
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    _HeroChar('assets/images/chars/poli_red.jpg'),
+                    SizedBox(width: 18),
+                    _HeroChar('assets/images/chars/amber_yellow.jpg'),
+                    SizedBox(width: 18),
+                    _HeroChar('assets/images/chars/helly_blue.jpg'),
+                  ],
                 ),
-                const SizedBox(height: 28),
-                Text(
-                  'пиксельная вечеринка · робокар ретро',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontFamily: 'PressStart2P',
-                    fontSize: 10,
-                    color: PoliColors.steel.withValues(alpha: 0.95),
-                    height: 1.6,
-                  ),
-                ),
-                const SizedBox(height: 36),
-                Text(
-                  _status,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontFamily: 'PressStart2P',
-                    fontSize: 10,
-                    height: 1.7,
-                    color: PoliColors.rescueBlue,
-                  ),
-                ),
-                if (_gate == _SplashGate.downloading) ...[
-                  const SizedBox(height: 16),
-                  SizedBox(
-                    width: 420,
-                    child: LinearProgressIndicator(
-                      value: _progress.clamp(0.0, 1.0),
-                      minHeight: 10,
-                      color: PoliColors.beaconYellow,
-                      backgroundColor: PoliColors.road,
-                    ),
-                  ),
-                ],
-                if (_error != null) ...[
-                  const SizedBox(height: 12),
-                  Text(
-                    _error!,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontFamily: 'PressStart2P',
-                      fontSize: 9,
-                      height: 1.6,
-                      color: PoliColors.robocarRed,
-                    ),
-                  ),
-                ],
-                const SizedBox(height: 36),
-                if (_gate == _SplashGate.ready)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                const SizedBox(height: 18),
+                PixelPanel(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 28, vertical: 22),
+                  child: Column(
                     children: [
-                      TvButton(
-                        label: 'СТАРТ',
-                        autofocus: true,
-                        onPressed: widget.onStart,
+                      const Text(
+                        'С ДНЕМ РОЖДЕНИЯ,\nСОНЯ',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontFamily: 'PressStart2P',
+                          fontSize: 28,
+                          height: 1.55,
+                          color: PoliColors.robocarRed,
+                          shadows: [
+                            Shadow(
+                              color: PoliColors.amberYellow,
+                              offset: Offset(2, 2),
+                            ),
+                          ],
+                        ),
                       ),
-                      const SizedBox(width: 20),
-                      TvButton(
-                        label: 'РЕДАКТОР',
-                        primary: false,
-                        onPressed: widget.onEditor,
+                      const SizedBox(height: 14),
+                      Text(
+                        'пиксельные спасатели · город робокаров',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontFamily: 'PressStart2P',
+                          fontSize: 9,
+                          color: PoliColors.inkSoft.withValues(alpha: 0.95),
+                          height: 1.6,
+                        ),
                       ),
-                      const SizedBox(width: 20),
-                      TvButton(
-                        label: _pending != null ? 'ОБНОВИТЬ' : 'ПРОВЕРИТЬ',
-                        primary: false,
-                        onPressed: _pending != null ? _retryInstall : _runUpdateFlow,
+                      const SizedBox(height: 18),
+                      Text(
+                        _status,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontFamily: 'PressStart2P',
+                          fontSize: 9,
+                          height: 1.7,
+                          color: PoliColors.hellyBlue,
+                        ),
+                      ),
+                      if (_gate == _SplashGate.downloading) ...[
+                        const SizedBox(height: 14),
+                        SizedBox(
+                          width: 420,
+                          child: LinearProgressIndicator(
+                            value: _progress.clamp(0.0, 1.0),
+                            minHeight: 10,
+                            color: PoliColors.robocarRed,
+                            backgroundColor: PoliColors.panelDeep,
+                          ),
+                        ),
+                      ],
+                      if (_error != null) ...[
+                        const SizedBox(height: 10),
+                        Text(
+                          _error!,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontFamily: 'PressStart2P',
+                            fontSize: 8,
+                            height: 1.6,
+                            color: PoliColors.robocarRed,
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 22),
+                      if (_gate == _SplashGate.ready)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            TvButton(
+                              label: 'СТАРТ',
+                              autofocus: true,
+                              onPressed: widget.onStart,
+                            ),
+                            const SizedBox(width: 16),
+                            TvButton(
+                              label: 'РЕДАКТОР',
+                              primary: false,
+                              onPressed: widget.onEditor,
+                            ),
+                            const SizedBox(width: 16),
+                            TvButton(
+                              label:
+                                  _pending != null ? 'ОБНОВИТЬ' : 'ПРОВЕРИТЬ',
+                              primary: false,
+                              onPressed: _pending != null
+                                  ? _retryInstall
+                                  : _runUpdateFlow,
+                            ),
+                          ],
+                        )
+                      else if (_gate == _SplashGate.installing)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            TvButton(
+                              label: 'ПОВТОРИТЬ',
+                              autofocus: true,
+                              onPressed: _retryInstall,
+                            ),
+                            const SizedBox(width: 16),
+                            TvButton(
+                              label: 'ИГРАТЬ ТАК',
+                              primary: false,
+                              onPressed: () =>
+                                  setState(() => _gate = _SplashGate.ready),
+                            ),
+                          ],
+                        )
+                      else if (busy)
+                        const Text(
+                          'Подождите…',
+                          style: TextStyle(
+                            fontFamily: 'PressStart2P',
+                            fontSize: 9,
+                            color: PoliColors.inkSoft,
+                          ),
+                        ),
+                      const SizedBox(height: 14),
+                      const Text(
+                        'Пульт: стрелки · OK · Back',
+                        style: TextStyle(
+                          fontFamily: 'PressStart2P',
+                          fontSize: 8,
+                          color: PoliColors.inkSoft,
+                        ),
                       ),
                     ],
-                  )
-                else if (_gate == _SplashGate.installing)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      TvButton(
-                        label: 'ПОВТОРИТЬ',
-                        autofocus: true,
-                        onPressed: _retryInstall,
-                      ),
-                      const SizedBox(width: 20),
-                      TvButton(
-                        label: 'ИГРАТЬ ТАК',
-                        primary: false,
-                        onPressed: () => setState(() => _gate = _SplashGate.ready),
-                      ),
-                    ],
-                  )
-                else if (busy)
-                  const Text(
-                    'Подождите…',
-                    style: TextStyle(
-                      fontFamily: 'PressStart2P',
-                      fontSize: 9,
-                      color: PoliColors.steel,
-                    ),
-                  ),
-                const SizedBox(height: 24),
-                const Text(
-                  'Пульт: стрелки · OK · Back',
-                  style: TextStyle(
-                    fontFamily: 'PressStart2P',
-                    fontSize: 9,
-                    color: PoliColors.steel,
                   ),
                 ),
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _HeroChar extends StatelessWidget {
+  const _HeroChar(this.path);
+
+  final String path;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 108,
+      height: 108,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white, width: 4),
+        boxShadow: [
+          BoxShadow(
+            color: PoliColors.robocarRed.withValues(alpha: 0.28),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Image.asset(
+        path,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => const ColoredBox(
+          color: PoliColors.panelDeep,
+          child:
+              Icon(Icons.directions_car, color: PoliColors.robocarRed, size: 48),
         ),
       ),
     );

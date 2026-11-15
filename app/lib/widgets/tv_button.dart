@@ -2,7 +2,6 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 
 import '../input/input_router.dart';
-
 import '../theme/app_theme.dart';
 
 class TvButton extends StatefulWidget {
@@ -32,13 +31,14 @@ class _TvButtonState extends State<TvButton> {
   Widget build(BuildContext context) {
     final enabled = widget.enabled && widget.onPressed != null;
     final bg = !enabled
-        ? PoliColors.dimLetter
+        ? const Color(0xFFCFD8DC)
         : widget.primary
             ? PoliColors.robocarRed
-            : PoliColors.road;
+            : PoliColors.hellyBlue;
     final border = _focused
-        ? PoliColors.focus
-        : (widget.primary ? PoliColors.robocarRed : PoliColors.steel);
+        ? PoliColors.focusRing
+        : (widget.primary ? const Color(0xFFB71C1C) : const Color(0xFF1565C0));
+    final fg = enabled ? Colors.white : PoliColors.inkSoft;
 
     return Focus(
       autofocus: widget.autofocus,
@@ -58,24 +58,30 @@ class _TvButtonState extends State<TvButton> {
           padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 18),
           decoration: BoxDecoration(
             color: bg,
-            borderRadius: BorderRadius.circular(4),
-            border: Border.all(color: border, width: _focused ? 4 : 2),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: border, width: _focused ? 4 : 3),
             boxShadow: _focused
                 ? [
                     BoxShadow(
-                      color: PoliColors.beaconYellow.withValues(alpha: 0.35),
-                      blurRadius: 12,
+                      color: PoliColors.amberYellow.withValues(alpha: 0.55),
+                      blurRadius: 14,
                       spreadRadius: 1,
                     ),
                   ]
-                : null,
+                : [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.18),
+                      blurRadius: 6,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
           ),
           child: Text(
             widget.label,
             style: TextStyle(
               fontFamily: 'PressStart2P',
               fontSize: 12,
-              color: enabled ? PoliColors.cream : PoliColors.steel,
+              color: fg,
             ),
           ),
         ),

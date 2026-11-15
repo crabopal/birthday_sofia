@@ -3,7 +3,7 @@ import 'package:material_ui/material_ui.dart';
 import '../controllers/game_controller.dart';
 import '../theme/app_theme.dart';
 import '../wheel/wheel_widget.dart';
-import '../widgets/scanlines.dart';
+import '../widgets/pixel_scaffold.dart';
 import '../widgets/tv_button.dart';
 
 class WheelScreen extends StatefulWidget {
@@ -89,40 +89,47 @@ class _WheelScreenState extends State<WheelScreen>
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Равноразделенный круг.\nВыбывает до нового круга.',
-                    style: TextStyle(
-                      fontFamily: 'PressStart2P',
-                      fontSize: 10,
-                      height: 1.7,
-                      color: PoliColors.cream,
+                  PixelPanel(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Равноразделенный круг.\nВыбывает до нового круга.',
+                          style: TextStyle(
+                            fontFamily: 'PressStart2P',
+                            fontSize: 10,
+                            height: 1.7,
+                            color: PoliColors.ink,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        if (_winner == null)
+                          TvButton(
+                            label: _spinning ? 'КРУТИТСЯ...' : 'КРУТИТЬ',
+                            autofocus: true,
+                            enabled: !_spinning,
+                            onPressed: _spinning ? null : _spin,
+                          )
+                        else ...[
+                          Text(
+                            'Ход: $_winner',
+                            style: const TextStyle(
+                              fontFamily: 'PressStart2P',
+                              fontSize: 14,
+                              color: PoliColors.robocarRed,
+                              height: 1.5,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          TvButton(
+                            label: 'К УРОВНЮ',
+                            autofocus: true,
+                            onPressed: () => widget.controller.openLevel(),
+                          ),
+                        ],
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 28),
-                  if (_winner == null)
-                    TvButton(
-                      label: _spinning ? 'КРУТИТСЯ...' : 'КРУТИТЬ',
-                      autofocus: true,
-                      enabled: !_spinning,
-                      onPressed: _spinning ? null : _spin,
-                    )
-                  else ...[
-                    Text(
-                      'Ход: $_winner',
-                      style: const TextStyle(
-                        fontFamily: 'PressStart2P',
-                        fontSize: 14,
-                        color: PoliColors.beaconYellow,
-                        height: 1.5,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    TvButton(
-                      label: 'К УРОВНЮ',
-                      autofocus: true,
-                      onPressed: () => widget.controller.openLevel(),
-                    ),
-                  ],
                 ],
               ),
             ),

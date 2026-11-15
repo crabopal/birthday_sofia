@@ -7,7 +7,7 @@ import '../models/level.dart';
 import '../services/media_resolver.dart';
 import '../theme/app_theme.dart';
 import '../widgets/letter_progress.dart';
-import '../widgets/scanlines.dart';
+import '../widgets/pixel_scaffold.dart';
 import '../widgets/tv_button.dart';
 
 class LevelScreen extends StatefulWidget {
@@ -152,6 +152,7 @@ class _LevelScreenState extends State<LevelScreen> {
     final snap = widget.controller.snapshot;
     if (lvl == null) {
       return const PixelScaffold(
+        showCharacters: false,
         child: Center(child: Text('Нет уровня')),
       );
     }
@@ -162,6 +163,7 @@ class _LevelScreenState extends State<LevelScreen> {
 
     return PixelScaffold(
       title: lvl.title,
+      showCharacters: false,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 8),
         child: Row(
@@ -181,7 +183,7 @@ class _LevelScreenState extends State<LevelScreen> {
                         fontFamily: 'PressStart2P',
                         fontSize: 14,
                         height: 1.6,
-                        color: PoliColors.cream,
+                        color: PoliColors.ink,
                       ),
                     ),
                   ] else
@@ -192,7 +194,7 @@ class _LevelScreenState extends State<LevelScreen> {
                         style: TextStyle(
                           fontFamily: 'PressStart2P',
                           fontSize: 12,
-                          color: PoliColors.steel,
+                          color: PoliColors.inkSoft,
                         ),
                       ),
                     ),
@@ -202,91 +204,93 @@ class _LevelScreenState extends State<LevelScreen> {
             const SizedBox(width: 28),
             Expanded(
               flex: 4,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  LetterProgressView(
-                    completedLetters: snap.completedLetters,
-                    currentLetterIndex: lvl.letterIndex,
-                    compact: true,
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Ход: ${snap.selectedGuest ?? '—'}',
-                    style: const TextStyle(
-                      fontFamily: 'PressStart2P',
-                      fontSize: 11,
-                      color: PoliColors.beaconYellow,
+              child: PixelPanel(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    LetterProgressView(
+                      completedLetters: snap.completedLetters,
+                      currentLetterIndex: lvl.letterIndex,
+                      compact: true,
                     ),
-                  ),
-                  const Spacer(),
-                  if (showQuestion) ...[
-                    TextField(
-                      controller: _answerController,
-                      focusNode: _answerFocus,
-                      autofocus: lvl.type != LevelType.videoQuestion,
-                      textInputAction: TextInputAction.done,
-                      onSubmitted: (_) => _submit(),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Ход: ${snap.selectedGuest ?? '—'}',
                       style: const TextStyle(
                         fontFamily: 'PressStart2P',
-                        fontSize: 14,
-                        color: PoliColors.cream,
-                      ),
-                      decoration: const InputDecoration(
-                        hintText: 'Ответ',
-                        labelText: 'Ответ',
-                        labelStyle: TextStyle(
-                          fontFamily: 'PressStart2P',
-                          fontSize: 10,
-                          color: PoliColors.steel,
-                        ),
+                        fontSize: 11,
+                        color: PoliColors.robocarRed,
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        TvButton(
-                          label: 'ОТВЕТИТЬ',
-                          onPressed: _submitting ? null : _submit,
-                          enabled: !_submitting,
+                    const Spacer(),
+                    if (showQuestion) ...[
+                      TextField(
+                        controller: _answerController,
+                        focusNode: _answerFocus,
+                        autofocus: lvl.type != LevelType.videoQuestion,
+                        textInputAction: TextInputAction.done,
+                        onSubmitted: (_) => _submit(),
+                        style: const TextStyle(
+                          fontFamily: 'PressStart2P',
+                          fontSize: 14,
+                          color: PoliColors.ink,
                         ),
-                        if (lvl.type == LevelType.audioQuestion) ...[
-                          const SizedBox(width: 12),
-                          TvButton(
-                            label: 'ЕЩЁ РАЗ',
-                            primary: false,
-                            onPressed: _replayAudio,
+                        decoration: const InputDecoration(
+                          hintText: 'Ответ',
+                          labelText: 'Ответ',
+                          labelStyle: TextStyle(
+                            fontFamily: 'PressStart2P',
+                            fontSize: 10,
+                            color: PoliColors.inkSoft,
                           ),
-                        ],
-                      ],
-                    ),
-                    if (snap.lastFeedback != null) ...[
+                        ),
+                      ),
                       const SizedBox(height: 16),
-                      Text(
-                        snap.lastFeedback!,
-                        style: TextStyle(
-                          fontFamily: 'PressStart2P',
-                          fontSize: 12,
-                          color: snap.lastFeedback == 'Верно!'
-                              ? PoliColors.beaconYellow
-                              : PoliColors.robocarRed,
-                        ),
+                      Row(
+                        children: [
+                          TvButton(
+                            label: 'ОТВЕТИТЬ',
+                            onPressed: _submitting ? null : _submit,
+                            enabled: !_submitting,
+                          ),
+                          if (lvl.type == LevelType.audioQuestion) ...[
+                            const SizedBox(width: 12),
+                            TvButton(
+                              label: 'ЕЩЁ РАЗ',
+                              primary: false,
+                              onPressed: _replayAudio,
+                            ),
+                          ],
+                        ],
                       ),
+                      if (snap.lastFeedback != null) ...[
+                        const SizedBox(height: 16),
+                        Text(
+                          snap.lastFeedback!,
+                          style: TextStyle(
+                            fontFamily: 'PressStart2P',
+                            fontSize: 12,
+                            color: snap.lastFeedback == 'Верно!'
+                                ? PoliColors.mint
+                                : PoliColors.robocarRed,
+                          ),
+                        ),
+                      ],
                     ],
-                  ],
-                  if (!_mediaReady)
-                    const Padding(
-                      padding: EdgeInsets.only(top: 12),
-                      child: Text(
-                        'Загрузка медиа...',
-                        style: TextStyle(
-                          fontFamily: 'PressStart2P',
-                          fontSize: 9,
-                          color: PoliColors.steel,
+                    if (!_mediaReady)
+                      const Padding(
+                        padding: EdgeInsets.only(top: 12),
+                        child: Text(
+                          'Загрузка медиа...',
+                          style: TextStyle(
+                            fontFamily: 'PressStart2P',
+                            fontSize: 9,
+                            color: PoliColors.inkSoft,
+                          ),
                         ),
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],
@@ -300,9 +304,11 @@ class _LevelScreenState extends State<LevelScreen> {
       case LevelType.pictureQuestion:
         return Container(
           decoration: BoxDecoration(
-            border: Border.all(color: PoliColors.steel, width: 3),
-            color: PoliColors.night,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: PoliColors.panelBorder, width: 3),
+            color: PoliColors.softWhite,
           ),
+          clipBehavior: Clip.antiAlias,
           child: _image ??
               const Center(
                 child: Text(
@@ -310,7 +316,7 @@ class _LevelScreenState extends State<LevelScreen> {
                   style: TextStyle(
                     fontFamily: 'PressStart2P',
                     fontSize: 12,
-                    color: PoliColors.steel,
+                    color: PoliColors.inkSoft,
                   ),
                 ),
               ),
@@ -319,11 +325,16 @@ class _LevelScreenState extends State<LevelScreen> {
         final video = _video;
         if (video == null || !video.value.isInitialized) {
           return const Center(
-            child: CircularProgressIndicator(color: PoliColors.beaconYellow),
+            child: CircularProgressIndicator(color: PoliColors.robocarRed),
           );
         }
         return Container(
-          color: Colors.black,
+          decoration: BoxDecoration(
+            color: Colors.black,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: PoliColors.panelBorder, width: 3),
+          ),
+          clipBehavior: Clip.antiAlias,
           alignment: Alignment.center,
           child: AspectRatio(
             aspectRatio: video.value.aspectRatio,
@@ -333,21 +344,22 @@ class _LevelScreenState extends State<LevelScreen> {
       case LevelType.audioQuestion:
         return Container(
           decoration: BoxDecoration(
-            border: Border.all(color: PoliColors.rescueBlue, width: 3),
-            color: PoliColors.night,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: PoliColors.hellyBlue, width: 3),
+            color: PoliColors.panel,
           ),
           child: const Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.music_note, size: 72, color: PoliColors.beaconYellow),
+                Icon(Icons.music_note, size: 72, color: PoliColors.hellyBlue),
                 SizedBox(height: 16),
                 Text(
                   'АУДИО-ВОПРОС',
                   style: TextStyle(
                     fontFamily: 'PressStart2P',
                     fontSize: 14,
-                    color: PoliColors.cream,
+                    color: PoliColors.ink,
                   ),
                 ),
               ],

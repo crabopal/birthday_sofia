@@ -1,6 +1,6 @@
 {
-  "versionCode": 5,
-  "versionName": "1.1.3",
+  "versionCode": 6,
+  "versionName": "1.2.0",
   "apkUrl": "https://raw.githubusercontent.com/crabopal/birthday_sofia/cursor%2Fsonya-birthday-game-apk-922d/dist/sonya-birthday-release.apk",
-  "notes": "Fix OTA: parse GitHub text/plain version.json"
+  "notes": "Poli-bright restyle: city bg, pixel characters, BGM loop, better SFX"
 }

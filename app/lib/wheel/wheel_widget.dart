@@ -37,7 +37,7 @@ class ParticipantWheel extends StatelessWidget {
             child: Icon(
               Icons.arrow_drop_down,
               size: 56,
-              color: PoliColors.beaconYellow,
+              color: PoliColors.robocarRed,
             ),
           ),
           if (winner != null)
@@ -47,15 +47,16 @@ class ParticipantWheel extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 decoration: BoxDecoration(
-                  color: PoliColors.night.withValues(alpha: 0.9),
-                  border: Border.all(color: PoliColors.beaconYellow, width: 2),
+                  color: PoliColors.panel.withValues(alpha: 0.95),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: PoliColors.robocarRed, width: 3),
                 ),
                 child: Text(
                   winner!,
                   style: const TextStyle(
                     fontFamily: 'PressStart2P',
                     fontSize: 14,
-                    color: PoliColors.beaconYellow,
+                    color: PoliColors.robocarRed,
                   ),
                 ),
               ),
@@ -142,7 +143,7 @@ class _WheelPainter extends CustomPainter {
       Paint()
         ..style = PaintingStyle.stroke
         ..strokeWidth = 3
-        ..color = PoliColors.beaconYellow,
+        ..color = PoliColors.amberYellow,
     );
   }
 

@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../models/game_state.dart';
 import '../models/level.dart';
 import '../services/level_pack_store.dart';
+import '../services/music_service.dart';
 import '../services/voice_service.dart';
 import '../wheel/fair_queue.dart';
 
@@ -11,14 +12,17 @@ class GameController extends ChangeNotifier {
     VoiceService? voice,
     FairQueue? queue,
     LevelPackStore? store,
+    MusicService? music,
   })  : store = store ?? LevelPackStore(),
-        _queue = queue ?? FairQueue() {
+        _queue = queue ?? FairQueue(),
+        music = music ?? MusicService() {
     _voice = voice ?? VoiceService(store: this.store);
   }
 
   late final VoiceService _voice;
   final FairQueue _queue;
   final LevelPackStore store;
+  final MusicService music;
 
   LevelsPack? _pack;
   GameSnapshot _snapshot = const GameSnapshot(
@@ -37,6 +41,8 @@ class GameController extends ChangeNotifier {
   LevelsPack? get pack => _pack;
   VoiceService get voice => _voice;
   FairQueue get queue => _queue;
+
+  Future<void> ensureMusic() => music.start();
 
   /// Playable (ready) levels in letter order.
   List<LevelDefinition> get playableLevels => _pack?.playableLevels ?? const [];
@@ -79,6 +85,7 @@ class GameController extends ChangeNotifier {
   }
 
   void goToLobby() {
+    music.setMenuVolume();
     _snapshot = _snapshot.copyWith(
       phase: GamePhase.lobby,
       clearFeedback: true,
@@ -109,6 +116,7 @@ class GameController extends ChangeNotifier {
   void startGame() {
     if (_snapshot.guests.length < 2) return;
     if (playableLevels.isEmpty) return;
+    music.setMenuVolume();
     _queue.setGuests(_snapshot.guests);
     _snapshot = _snapshot.copyWith(
       phase: GamePhase.progress,
@@ -151,6 +159,7 @@ class GameController extends ChangeNotifier {
   }
 
   void openLevel() {
+    music.setGameplayVolume();
     _snapshot = _snapshot.copyWith(phase: GamePhase.level, clearFeedback: true);
     notifyListeners();
     // Short SFX; question narration is handled on LevelScreen when the
@@ -187,6 +196,7 @@ class GameController extends ChangeNotifier {
 
   void advanceAfterCorrect() {
     final nextIndex = _snapshot.currentLevelIndex + 1;
+    music.setMenuVolume();
     if (nextIndex >= playableLevels.length) {
       _snapshot = _snapshot.copyWith(
         phase: GamePhase.demoDone,
@@ -208,6 +218,7 @@ class GameController extends ChangeNotifier {
   }
 
   void restart() {
+    music.setMenuVolume();
     _snapshot = const GameSnapshot(
       phase: GamePhase.lobby,
       guests: [],
@@ -222,6 +233,7 @@ class GameController extends ChangeNotifier {
   }
 
   void backToSplash() {
+    music.setMenuVolume();
     _snapshot = _snapshot.copyWith(
       phase: GamePhase.splash,
       clearFeedback: true,
@@ -233,6 +245,7 @@ class GameController extends ChangeNotifier {
   @override
   void dispose() {
     _voice.dispose();
+    music.dispose();
     super.dispose();
   }
 }

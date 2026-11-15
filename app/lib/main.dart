@@ -36,7 +36,7 @@ class SonyaBirthdayApp extends StatelessWidget {
     return MaterialApp(
       title: 'С днем рождения, Соня',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.dark,
+      theme: AppTheme.light,
       home: GameRoot(controller: controller),
     );
   }
@@ -92,6 +92,7 @@ class _GameRootState extends State<GameRoot> {
       case GamePhase.splash:
         return SplashScreen(
           onStart: widget.controller.goToLobby,
+          onReadyMusic: widget.controller.ensureMusic,
           onEditor: () {
             Navigator.of(context).push(
               MaterialPageRoute<void>(

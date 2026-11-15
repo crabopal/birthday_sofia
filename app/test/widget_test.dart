@@ -2,14 +2,22 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:sonya_birthday/controllers/game_controller.dart';
 import 'package:sonya_birthday/main.dart';
 import 'package:sonya_birthday/models/level.dart';
+import 'package:sonya_birthday/services/music_service.dart';
+import 'package:sonya_birthday/services/voice_service.dart';
 
 void main() {
   testWidgets('splash shows start button', (tester) async {
-    final controller = GameController();
-    // Inject empty pack so we don't need asset bundle in this smoke test path
-    // after going past splash; splash itself does not need pack.
+    final controller = GameController(
+      voice: VoiceService()..disableForTests(),
+      music: MusicService()..disableForTests(),
+    );
     await tester.pumpWidget(SonyaBirthdayApp(controller: controller));
-    await tester.pumpAndSettle();
+    // Splash runs OTA check; settle with a timeout-friendly pump loop.
+    await tester.pump();
+    for (var i = 0; i < 20; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+      if (find.text('СТАРТ').evaluate().isNotEmpty) break;
+    }
     expect(find.text('СТАРТ'), findsOneWidget);
     expect(find.text('РЕДАКТОР'), findsOneWidget);
     expect(find.textContaining('СОНЯ'), findsOneWidget);
