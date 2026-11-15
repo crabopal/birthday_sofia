@@ -1,6 +1,6 @@
 {
-  "versionCode": 9,
-  "versionName": "1.2.3",
+  "versionCode": 10,
+  "versionName": "1.2.4",
   "apkUrl": "https://raw.githubusercontent.com/crabopal/birthday_sofia/cursor%2Fsonya-birthday-game-apk-922d/dist/sonya-birthday-release.apk",
-  "notes": "Better robocar sprites from refs; guest avatars Poli→Roy→Amber→Helly"
+  "notes": "New 8-bit opening-style BGM loop (original chiptune)"
 }
