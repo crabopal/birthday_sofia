@@ -90,8 +90,10 @@ class _LobbyScreenState extends State<LobbyScreen> {
                       TvButton(
                         label: 'НАЧАТЬ',
                         primary: true,
-                        enabled: guests.length >= 2,
-                        onPressed: guests.length >= 2
+                        enabled: guests.length >= 2 &&
+                            widget.controller.playableLevels.isNotEmpty,
+                        onPressed: guests.length >= 2 &&
+                                widget.controller.playableLevels.isNotEmpty
                             ? () => widget.controller.startGame()
                             : null,
                       ),
@@ -109,9 +111,12 @@ class _LobbyScreenState extends State<LobbyScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    guests.length < 2
-                        ? 'Нужно минимум 2 гостя'
-                        : 'Готово: ${guests.length}',
+                    () {
+                      final ready = widget.controller.playableLevels.length;
+                      if (guests.length < 2) return 'Нужно минимум 2 гостя';
+                      if (ready == 0) return 'Нет уровней «в игре» — откройте РЕДАКТОР';
+                      return 'Готово: ${guests.length} · уровней: $ready';
+                    }(),
                     style: const TextStyle(
                       fontFamily: 'PressStart2P',
                       fontSize: 9,

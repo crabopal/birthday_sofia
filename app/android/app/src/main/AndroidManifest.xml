@@ -1,5 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <!-- Google TV / Android TV -->
     <uses-feature
         android:name="android.software.leanback"
@@ -15,7 +17,8 @@
         android:label="Соня ДР"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-        android:banner="@mipmap/ic_launcher">
+        android:banner="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="true">
         <activity
             android:name=".MainActivity"
             android:exported="true"

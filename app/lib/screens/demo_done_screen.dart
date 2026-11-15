@@ -35,7 +35,7 @@ class DemoDoneScreen extends StatelessWidget {
             ),
             const SizedBox(height: 28),
             const Text(
-              'Три демо-уровня сыграны.\nОстальные буквы ждут контент.',
+              'Сыгранные уровни пройдены.\nНовые — в РЕДАКТОРЕ на сплэше.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontFamily: 'PressStart2P',
@@ -49,6 +49,12 @@ class DemoDoneScreen extends StatelessWidget {
               label: 'СНОВА В ЛОББИ',
               autofocus: true,
               onPressed: () => controller.restart(),
+            ),
+            const SizedBox(height: 16),
+            TvButton(
+              label: 'НА СПЛЭШ',
+              primary: false,
+              onPressed: () => controller.backToSplash(),
             ),
           ],
         ),

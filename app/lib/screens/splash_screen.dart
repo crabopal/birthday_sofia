@@ -5,9 +5,14 @@ import '../widgets/scanlines.dart';
 import '../widgets/tv_button.dart';
 
 class SplashScreen extends StatelessWidget {
-  const SplashScreen({super.key, required this.onStart});
+  const SplashScreen({
+    super.key,
+    required this.onStart,
+    required this.onEditor,
+  });
 
   final VoidCallback onStart;
+  final VoidCallback onEditor;
 
   @override
   Widget build(BuildContext context) {
@@ -45,10 +50,21 @@ class SplashScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 48),
-                TvButton(
-                  label: 'СТАРТ',
-                  autofocus: true,
-                  onPressed: onStart,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TvButton(
+                      label: 'СТАРТ',
+                      autofocus: true,
+                      onPressed: onStart,
+                    ),
+                    const SizedBox(width: 20),
+                    TvButton(
+                      label: 'РЕДАКТОР',
+                      primary: false,
+                      onPressed: onEditor,
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 24),
                 const Text(

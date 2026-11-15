@@ -1,20 +1,23 @@
-import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 
 import '../models/game_state.dart';
 import '../models/level.dart';
+import '../services/level_pack_store.dart';
 import '../services/voice_service.dart';
 import '../wheel/fair_queue.dart';
 
 class GameController extends ChangeNotifier {
-  GameController({VoiceService? voice, FairQueue? queue})
-      : _voice = voice ?? VoiceService(),
-        _queue = queue ?? FairQueue();
+  GameController({
+    VoiceService? voice,
+    FairQueue? queue,
+    LevelPackStore? store,
+  })  : _voice = voice ?? VoiceService(),
+        _queue = queue ?? FairQueue(),
+        store = store ?? LevelPackStore();
 
   final VoiceService _voice;
   final FairQueue _queue;
+  final LevelPackStore store;
 
   LevelsPack? _pack;
   GameSnapshot _snapshot = const GameSnapshot(
@@ -34,28 +37,44 @@ class GameController extends ChangeNotifier {
   VoiceService get voice => _voice;
   FairQueue get queue => _queue;
 
+  /// Playable (ready) levels in letter order.
+  List<LevelDefinition> get playableLevels => _pack?.playableLevels ?? const [];
+
   LevelDefinition? get currentLevel {
-    final pack = _pack;
-    if (pack == null) return null;
+    final levels = playableLevels;
     if (_snapshot.currentLevelIndex < 0 ||
-        _snapshot.currentLevelIndex >= pack.levels.length) {
+        _snapshot.currentLevelIndex >= levels.length) {
       return null;
     }
-    return pack.levels[_snapshot.currentLevelIndex];
+    return levels[_snapshot.currentLevelIndex];
   }
 
-  bool get hasMoreDemoLevels {
-    final pack = _pack;
-    if (pack == null) return false;
-    return _snapshot.currentLevelIndex < pack.levels.length;
+  bool get hasMoreLevels {
+    return _snapshot.currentLevelIndex < playableLevels.length;
   }
 
-  Future<void> loadDemoPack() async {
-    final raw = await rootBundle.loadString('assets/levels/demo.json');
-    final json = jsonDecode(raw) as Map<String, dynamic>;
-    _pack = LevelsPack.fromJson(json);
+  Future<void> loadPack() async {
+    _pack = await store.load();
     _voice.configure(_pack!.voiceLines);
     notifyListeners();
+  }
+
+  Future<void> reloadPack() async {
+    await loadPack();
+  }
+
+  Future<void> savePack(LevelsPack pack) async {
+    _pack = pack;
+    await store.save(pack);
+    _voice.configure(pack.voiceLines);
+    notifyListeners();
+  }
+
+  Future<void> updateLevelAtPackIndex(int packIndex, LevelDefinition level) async {
+    final pack = _pack;
+    if (pack == null) return;
+    final next = pack.replaceLevel(packIndex, level);
+    await savePack(next);
   }
 
   void goToLobby() {
@@ -88,6 +107,7 @@ class GameController extends ChangeNotifier {
 
   void startGame() {
     if (_snapshot.guests.length < 2) return;
+    if (playableLevels.isEmpty) return;
     _queue.setGuests(_snapshot.guests);
     _snapshot = _snapshot.copyWith(
       phase: GamePhase.progress,
@@ -100,7 +120,7 @@ class GameController extends ChangeNotifier {
   }
 
   Future<void> continueFromProgress() async {
-    if (!hasMoreDemoLevels) {
+    if (!hasMoreLevels) {
       _snapshot = _snapshot.copyWith(phase: GamePhase.demoDone);
       notifyListeners();
       await _voice.playKey('victory');
@@ -115,7 +135,6 @@ class GameController extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Prepares spin: locks wheel names and returns winner + index for animation.
   Future<({String winner, int index})> prepareSpin() async {
     await _voice.playKey('spin');
     wheelNames = _queue.peekWheelNames();
@@ -164,8 +183,7 @@ class GameController extends ChangeNotifier {
 
   void advanceAfterCorrect() {
     final nextIndex = _snapshot.currentLevelIndex + 1;
-    final pack = _pack;
-    if (pack == null || nextIndex >= pack.levels.length) {
+    if (nextIndex >= playableLevels.length) {
       _snapshot = _snapshot.copyWith(
         phase: GamePhase.demoDone,
         currentLevelIndex: nextIndex,
@@ -196,6 +214,15 @@ class GameController extends ChangeNotifier {
     );
     wheelNames = const [];
     _queue.setGuests(const []);
+    notifyListeners();
+  }
+
+  void backToSplash() {
+    _snapshot = _snapshot.copyWith(
+      phase: GamePhase.splash,
+      clearFeedback: true,
+      clearSelectedGuest: true,
+    );
     notifyListeners();
   }
 

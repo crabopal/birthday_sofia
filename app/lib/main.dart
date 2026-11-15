@@ -4,6 +4,7 @@ import 'package:material_ui/material_ui.dart';
 import 'controllers/game_controller.dart';
 import 'models/game_state.dart';
 import 'screens/demo_done_screen.dart';
+import 'screens/editor/editor_home_screen.dart';
 import 'screens/level_screen.dart';
 import 'screens/lobby_screen.dart';
 import 'screens/progress_screen.dart';
@@ -20,7 +21,7 @@ Future<void> main() async {
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
   final controller = GameController();
-  await controller.loadDemoPack();
+  await controller.loadPack();
 
   runApp(SonyaBirthdayApp(controller: controller));
 }
@@ -89,7 +90,17 @@ class _GameRootState extends State<GameRoot> {
   Widget build(BuildContext context) {
     switch (_phase) {
       case GamePhase.splash:
-        return SplashScreen(onStart: widget.controller.goToLobby);
+        return SplashScreen(
+          onStart: widget.controller.goToLobby,
+          onEditor: () {
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) =>
+                    EditorHomeScreen(controller: widget.controller),
+              ),
+            );
+          },
+        );
       case GamePhase.lobby:
         return LobbyScreen(controller: widget.controller);
       case GamePhase.progress:

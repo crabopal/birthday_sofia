@@ -13,6 +13,9 @@ dependencies:
   video_player: ^2.10.0
   audioplayers: ^6.5.1
   material_ui: ^1.11.0
+  path_provider: ^2.1.6
+  shelf: ^1.4.3
+  shelf_router: ^1.1.5
 
 dev_dependencies:
   flutter_test:

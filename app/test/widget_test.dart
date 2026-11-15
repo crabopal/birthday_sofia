@@ -10,6 +10,7 @@ void main() {
     // after going past splash; splash itself does not need pack.
     await tester.pumpWidget(SonyaBirthdayApp(controller: controller));
     expect(find.text('СТАРТ'), findsOneWidget);
+    expect(find.text('РЕДАКТОР'), findsOneWidget);
     expect(find.textContaining('СОНЯ'), findsOneWidget);
   });
 

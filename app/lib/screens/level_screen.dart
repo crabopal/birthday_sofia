@@ -4,6 +4,7 @@ import 'package:video_player/video_player.dart';
 
 import '../controllers/game_controller.dart';
 import '../models/level.dart';
+import '../services/media_resolver.dart';
 import '../theme/app_theme.dart';
 import '../widgets/letter_progress.dart';
 import '../widgets/scanlines.dart';
@@ -23,15 +24,18 @@ class _LevelScreenState extends State<LevelScreen> {
   final _answerFocus = FocusNode();
   VideoPlayerController? _video;
   AudioPlayer? _audio;
+  Widget? _image;
   bool _mediaReady = false;
   bool _videoPausedForQuestion = false;
   bool _submitting = false;
+  late final MediaResolver _resolver;
 
   LevelDefinition? get level => widget.controller.currentLevel;
 
   @override
   void initState() {
     super.initState();
+    _resolver = MediaResolver(widget.controller.store);
     _initMedia();
   }
 
@@ -40,20 +44,23 @@ class _LevelScreenState extends State<LevelScreen> {
     if (lvl == null) return;
 
     if (lvl.type == LevelType.videoQuestion && lvl.videoAsset != null) {
-      final controller = VideoPlayerController.asset(lvl.videoAsset!);
+      final controller = await _resolver.openVideo(lvl.videoAsset);
+      if (controller == null) {
+        if (mounted) setState(() => _mediaReady = true);
+        return;
+      }
       _video = controller;
       await controller.initialize();
       controller.addListener(_onVideoTick);
       await controller.play();
-      if (mounted) {
-        setState(() => _mediaReady = true);
-      }
+      if (mounted) setState(() => _mediaReady = true);
     } else if (lvl.type == LevelType.audioQuestion && lvl.audioAsset != null) {
       _audio = AudioPlayer();
-      final path = lvl.audioAsset!.startsWith('assets/')
-          ? lvl.audioAsset!.substring('assets/'.length)
-          : lvl.audioAsset!;
-      await _audio!.play(AssetSource(path));
+      final source = await _resolver.audioSource(lvl.audioAsset);
+      if (source != null) await _audio!.play(source);
+      if (mounted) setState(() => _mediaReady = true);
+    } else if (lvl.type == LevelType.pictureQuestion) {
+      _image = await _resolver.imageWidget(lvl.imageAsset);
       if (mounted) setState(() => _mediaReady = true);
     } else {
       if (mounted) setState(() => _mediaReady = true);
@@ -76,11 +83,10 @@ class _LevelScreenState extends State<LevelScreen> {
   Future<void> _replayAudio() async {
     final lvl = level;
     if (lvl?.audioAsset == null || _audio == null) return;
-    final path = lvl!.audioAsset!.startsWith('assets/')
-        ? lvl.audioAsset!.substring('assets/'.length)
-        : lvl.audioAsset!;
+    final source = await _resolver.audioSource(lvl!.audioAsset);
+    if (source == null) return;
     await _audio!.stop();
-    await _audio!.play(AssetSource(path));
+    await _audio!.play(source);
   }
 
   Future<void> _submit() async {
@@ -113,6 +119,13 @@ class _LevelScreenState extends State<LevelScreen> {
 
   @override
   Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: widget.controller,
+      builder: (context, _) => _body(),
+    );
+  }
+
+  Widget _body() {
     final lvl = level;
     final snap = widget.controller.snapshot;
     if (lvl == null) {
@@ -212,7 +225,6 @@ class _LevelScreenState extends State<LevelScreen> {
                       children: [
                         TvButton(
                           label: 'ОТВЕТИТЬ',
-                          autofocus: false,
                           onPressed: _submitting ? null : _submit,
                           enabled: !_submitting,
                         ),
@@ -269,9 +281,17 @@ class _LevelScreenState extends State<LevelScreen> {
             border: Border.all(color: PoliColors.steel, width: 3),
             color: PoliColors.night,
           ),
-          child: lvl.imageAsset == null
-              ? const Center(child: Text('нет картинки'))
-              : Image.asset(lvl.imageAsset!, fit: BoxFit.contain),
+          child: _image ??
+              const Center(
+                child: Text(
+                  'нет картинки',
+                  style: TextStyle(
+                    fontFamily: 'PressStart2P',
+                    fontSize: 12,
+                    color: PoliColors.steel,
+                  ),
+                ),
+              ),
         );
       case LevelType.videoQuestion:
         final video = _video;
