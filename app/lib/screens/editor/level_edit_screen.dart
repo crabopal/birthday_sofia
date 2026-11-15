@@ -4,7 +4,6 @@ import '../../controllers/game_controller.dart';
 import '../../models/level.dart';
 import '../../models/phrase.dart';
 import '../../services/media_paths.dart';
-import '../../services/media_upload_server.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/pixel_scaffold.dart';
 import '../../widgets/tv_button.dart';
@@ -15,12 +14,10 @@ class LevelEditScreen extends StatefulWidget {
     super.key,
     required this.controller,
     required this.packIndex,
-    required this.uploadServer,
   });
 
   final GameController controller;
   final int packIndex;
-  final MediaUploadServer uploadServer;
 
   @override
   State<LevelEditScreen> createState() => _LevelEditScreenState();
@@ -75,7 +72,6 @@ class _LevelEditScreenState extends State<LevelEditScreen> {
       MaterialPageRoute(
         builder: (_) => MediaLibraryScreen(
           controller: widget.controller,
-          uploadServer: widget.uploadServer,
           pickMode: true,
         ),
       ),

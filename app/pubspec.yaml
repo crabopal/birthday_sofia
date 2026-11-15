@@ -1,7 +1,7 @@
 name: sonya_birthday
 description: "Пиксельная вечериночная игра «С днем рождения, Соня» для Google TV."
 publish_to: 'none'
-version: 1.2.10+16
+version: 1.2.11+17
 
 environment:
   sdk: ^3.14.0
@@ -14,12 +14,11 @@ dependencies:
   audioplayers: ^6.5.1
   material_ui: ^1.11.0
   path_provider: ^2.1.6
-  shelf: ^1.4.3
-  shelf_router: ^1.1.5
   flutter_tts: ^4.2.5
   package_info_plus: ^10.2.2
   dio: ^5.11.1
   open_filex: ^5.0.0
+  file_picker: ^13.3.3
 
 dev_dependencies:
   flutter_test:

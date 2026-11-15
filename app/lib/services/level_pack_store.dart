@@ -122,6 +122,30 @@ class LevelPackStore {
     return 'user:$safe';
   }
 
+  /// Copies a device file into the media library (preferred for large video).
+  Future<String> importFromPath(String path, {String? originalName}) async {
+    final source = File(path);
+    if (!await source.exists()) {
+      throw StateError('Файл не найден: $path');
+    }
+    final dir = await mediaDir;
+    final name = originalName ?? source.uri.pathSegments.last;
+    var safe = _safeName(name);
+    var dest = File('${dir.path}/$safe');
+    if (await dest.exists()) {
+      final stem = safe.contains('.')
+          ? safe.substring(0, safe.lastIndexOf('.'))
+          : safe;
+      final ext = safe.contains('.')
+          ? safe.substring(safe.lastIndexOf('.'))
+          : '';
+      safe = '${stem}_${DateTime.now().millisecondsSinceEpoch}$ext';
+      dest = File('${dir.path}/$safe');
+    }
+    await source.copy(dest.path);
+    return 'user:$safe';
+  }
+
   Future<void> deleteMedia(String userRef) async {
     if (!userRef.startsWith('user:')) return;
     final dir = await mediaDir;
