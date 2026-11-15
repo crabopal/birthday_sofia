@@ -1,6 +1,6 @@
 {
-  "versionCode": 22,
-  "versionName": "1.2.16",
+  "versionCode": 23,
+  "versionName": "1.2.17",
   "apkUrl": "https://raw.githubusercontent.com/crabopal/birthday_sofia/cursor%2Fsonya-birthday-game-apk-922d/dist/sonya-birthday-release.apk",
-  "notes": "App icon: birthday cake + Poli; TV leanback banner"
+  "notes": "Higher-detail character portraits (same designs); unified sky-blue backgrounds"
 }
