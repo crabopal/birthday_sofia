@@ -44,7 +44,7 @@ class ParticipantWheel extends StatelessWidget {
             child: Icon(
               Icons.arrow_drop_down,
               size: 56,
-              color: PoliColors.robocarRed,
+              color: Colors.black,
             ),
           ),
           if (winner != null)

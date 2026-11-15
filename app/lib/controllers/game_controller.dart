@@ -166,6 +166,8 @@ class GameController extends ChangeNotifier {
       await _voice.playKey('victory');
       return;
     }
+    // Keep full menu bed while the wheel spins (no gameplay duck).
+    await music.setMenuVolume();
     wheelNames = _queue.peekWheelNames();
     _snapshot = _snapshot.copyWith(
       phase: GamePhase.wheel,
@@ -176,6 +178,7 @@ class GameController extends ChangeNotifier {
   }
 
   Future<({String winner, int index})> prepareSpin() async {
+    await music.setMenuVolume();
     await _voice.playKey('spin');
     wheelNames = _queue.peekWheelNames();
     final winner = _queue.next();
@@ -187,6 +190,44 @@ class GameController extends ChangeNotifier {
   void finishSpin(String winner) {
     _snapshot = _snapshot.copyWith(selectedGuest: winner);
     notifyListeners();
+  }
+
+  /// Android/TV Back: leave the current phase without exiting the app.
+  /// Returns true if the event was handled in-app.
+  bool handleSystemBack() {
+    switch (_snapshot.phase) {
+      case GamePhase.splash:
+        return false;
+      case GamePhase.lobby:
+        backToSplash();
+        return true;
+      case GamePhase.progress:
+        goToLobby();
+        return true;
+      case GamePhase.wheel:
+        music.setMenuVolume();
+        _snapshot = _snapshot.copyWith(
+          phase: GamePhase.progress,
+          clearSelectedGuest: true,
+          clearFeedback: true,
+        );
+        notifyListeners();
+        return true;
+      case GamePhase.level:
+        // Leave the task → letter board (do not exit the app).
+        _voice.stopAll();
+        music.setMenuVolume();
+        _snapshot = _snapshot.copyWith(
+          phase: GamePhase.progress,
+          clearSelectedGuest: true,
+          clearFeedback: true,
+        );
+        notifyListeners();
+        return true;
+      case GamePhase.demoDone:
+        restart();
+        return true;
+    }
   }
 
   void openLevel() {

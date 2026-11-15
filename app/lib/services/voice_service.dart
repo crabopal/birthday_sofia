@@ -27,6 +27,26 @@ class VoiceService {
     return _injected ?? (_player ??= AudioPlayer());
   }
 
+  static final AudioContext _sfxContext = AudioContext(
+    android: const AudioContextAndroid(
+      isSpeakerphoneOn: false,
+      stayAwake: false,
+      contentType: AndroidContentType.sonification,
+      usageType: AndroidUsageType.assistanceSonification,
+      audioFocus: AndroidAudioFocus.none,
+    ),
+    iOS: AudioContextIOS(
+      category: AVAudioSessionCategory.ambient,
+      options: const {AVAudioSessionOptions.mixWithOthers},
+    ),
+  );
+
+  Future<void> _ensureSfxContext() async {
+    try {
+      await _audio.setAudioContext(_sfxContext);
+    } catch (_) {}
+  }
+
   void configure(Map<String, String> globalLines) {
     _globalLines = Map<String, String>.from(globalLines);
   }
@@ -63,6 +83,7 @@ class VoiceService {
     if (_disabled) return;
     try {
       await stopAll();
+      await _ensureSfxContext();
       final mediaStore = store;
       if (MediaPaths.isUser(path) && mediaStore != null) {
         final dir = await mediaStore.mediaDir;

@@ -1,6 +1,6 @@
 {
-  "versionCode": 17,
-  "versionName": "1.2.11",
+  "versionCode": 18,
+  "versionName": "1.2.12",
   "apkUrl": "https://raw.githubusercontent.com/crabopal/birthday_sofia/cursor%2Fsonya-birthday-game-apk-922d/dist/sonya-birthday-release.apk",
-  "notes": "Import media from device files; removed LAN upload URL"
+  "notes": "Back leaves level in-app; black wheel pointer; full BGM during spin"
 }

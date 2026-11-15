@@ -22,9 +22,25 @@ class MusicService {
 
   AudioPlayer get _audio => _injected ?? (_player ??= AudioPlayer());
 
+  /// Mix with SFX so a wheel spin beep does not system-duck the bed.
+  static final AudioContext _bgmContext = AudioContext(
+    android: const AudioContextAndroid(
+      isSpeakerphoneOn: false,
+      stayAwake: false,
+      contentType: AndroidContentType.music,
+      usageType: AndroidUsageType.game,
+      audioFocus: AndroidAudioFocus.none,
+    ),
+    iOS: AudioContextIOS(
+      category: AVAudioSessionCategory.ambient,
+      options: const {AVAudioSessionOptions.mixWithOthers},
+    ),
+  );
+
   Future<void> start() async {
     if (_disabled || _started) return;
     try {
+      await _audio.setAudioContext(_bgmContext);
       await _audio.setReleaseMode(ReleaseMode.loop);
       _baseVolume = menuVolume;
       await _audio.setVolume(menuVolume);
@@ -46,6 +62,8 @@ class MusicService {
 
   Future<void> setMenuVolume() async {
     _baseVolume = menuVolume;
+    // Clear any leftover task duck when returning to menu/wheel.
+    _duckDepth = 0;
     await _applyVolume();
   }
 

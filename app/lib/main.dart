@@ -106,6 +106,19 @@ class _GameRootState extends State<GameRoot> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    // Phase screens are not Navigator routes — intercept system Back so a
+    // level/task does not exit the whole app.
+    return PopScope(
+      canPop: _phase == GamePhase.splash,
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) return;
+        widget.controller.handleSystemBack();
+      },
+      child: _phaseChild(context),
+    );
+  }
+
+  Widget _phaseChild(BuildContext context) {
     switch (_phase) {
       case GamePhase.splash:
         return SplashScreen(
@@ -128,7 +141,9 @@ class _GameRootState extends State<GameRoot> with WidgetsBindingObserver {
         return WheelScreen(controller: widget.controller);
       case GamePhase.level:
         return LevelScreen(
-          key: ValueKey('level-${widget.controller.snapshot.currentLevelIndex}'),
+          key: ValueKey(
+            'level-${widget.controller.snapshot.currentLevelIndex}',
+          ),
           controller: widget.controller,
         );
       case GamePhase.demoDone:
