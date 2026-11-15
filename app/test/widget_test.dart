@@ -9,6 +9,7 @@ void main() {
     // Inject empty pack so we don't need asset bundle in this smoke test path
     // after going past splash; splash itself does not need pack.
     await tester.pumpWidget(SonyaBirthdayApp(controller: controller));
+    await tester.pumpAndSettle();
     expect(find.text('СТАРТ'), findsOneWidget);
     expect(find.text('РЕДАКТОР'), findsOneWidget);
     expect(find.textContaining('СОНЯ'), findsOneWidget);

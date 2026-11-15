@@ -55,6 +55,22 @@ android/                  LEANBACK_LAUNCHER, landscape
 
 На Google TV должен быть установлен русский голосовой движок (обычно уже есть в Google speech services).
 
+
+## Автообновление
+
+При запуске игра читает [`dist/version.json`](dist/version.json) с ветки **main** на GitHub.
+Если `versionCode` выше, чем у установленной APK — скачивает новый файл и открывает системный установщик (нужно подтвердить пультом OK).
+
+Чтобы выкатить обновление:
+
+1. Поднимите `version:` в `app/pubspec.yaml` (например `1.1.1+3`)
+2. `cd app && flutter build apk --release`
+3. Скопируйте APK в `dist/sonya-birthday-release.apk`
+4. Обновите `dist/version.json` (`versionCode` / `versionName` / `apkUrl`)
+5. Закоммитьте и **смержите в main**
+
+Полностью «тихая» установка без диалога Android на обычном Google TV невозможна — один OK на установщике обязателен.
+
 ## Сборка APK
 
 Нужны Flutter (stable) и Android SDK.
