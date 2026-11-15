@@ -15,11 +15,13 @@ class RobocarAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final radius = BorderRadius.circular(size * 0.18);
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
+        color: PoliColors.charCardBg,
+        borderRadius: radius,
         border: Border.all(color: Colors.white, width: 2),
         boxShadow: [
           BoxShadow(

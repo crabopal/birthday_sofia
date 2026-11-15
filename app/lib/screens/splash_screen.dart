@@ -345,11 +345,14 @@ class _HeroChar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final radius = BorderRadius.circular(size * 0.17);
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
+        // Same blue as char art so rounded corners never flash white.
+        color: PoliColors.charCardBg,
+        borderRadius: radius,
         border: Border.all(color: Colors.white, width: 4),
         boxShadow: [
           BoxShadow(

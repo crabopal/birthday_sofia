@@ -14,6 +14,8 @@ class PoliColors {
   static const Color hellyBlue = Color(0xFF1E88E5);
   static const Color mint = Color(0xFF43A047);
   static const Color softWhite = Color(0xFFFFFDF8);
+  /// Solid fill behind rounded character portraits (matches char JPG bg).
+  static const Color charCardBg = Color(0xFFC7EBF9);
   static const Color focusRing = Color(0xFFFF8A00);
   static const Color letterDone = Color(0xFF43A047);
   static const Color letterTodo = Color(0xFFB0BEC5);

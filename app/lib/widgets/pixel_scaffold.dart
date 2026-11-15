@@ -175,12 +175,14 @@ class _CharSprite extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final radius = BorderRadius.circular(size * 0.14);
     return Container(
       width: size,
       height: size,
       margin: const EdgeInsets.only(bottom: 6),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
+        color: PoliColors.charCardBg,
+        borderRadius: radius,
         border: Border.all(color: Colors.white, width: 3),
         boxShadow: [
           BoxShadow(
