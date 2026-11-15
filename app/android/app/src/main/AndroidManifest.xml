@@ -23,7 +23,7 @@
         android:label="Соня ДР"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
-        android:banner="@mipmap/ic_launcher"
+        android:banner="@drawable/tv_banner"
         android:usesCleartextTraffic="false">
         <activity
             android:name=".MainActivity"
