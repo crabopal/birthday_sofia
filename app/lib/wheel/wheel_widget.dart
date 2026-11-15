@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:material_ui/material_ui.dart';
 
 import '../theme/app_theme.dart';
+import 'wheel_spin.dart';
 
 class ParticipantWheel extends StatelessWidget {
   const ParticipantWheel({
@@ -30,12 +31,21 @@ class ParticipantWheel extends StatelessWidget {
               child: const SizedBox.expand(),
             ),
           ),
-          const Icon(Icons.arrow_drop_down, size: 48, color: PoliColors.beaconYellow),
+          // Pointer at the top — classic «Поле чудес» / wheel-of-fortune.
+          const Positioned(
+            top: 0,
+            child: Icon(
+              Icons.arrow_drop_down,
+              size: 56,
+              color: PoliColors.beaconYellow,
+            ),
+          ),
           if (winner != null)
             Positioned(
               bottom: 12,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 decoration: BoxDecoration(
                   color: PoliColors.night.withValues(alpha: 0.9),
                   border: Border.all(color: PoliColors.beaconYellow, width: 2),
@@ -78,6 +88,7 @@ class _WheelPainter extends CustomPainter {
     final sweep = 2 * pi / n;
 
     for (var i = 0; i < n; i++) {
+      // 0 at top (-pi/2), then clockwise — matches spin math in wheel_spin.dart.
       final start = -pi / 2 + i * sweep;
       final paint = Paint()
         ..style = PaintingStyle.fill
@@ -92,7 +103,7 @@ class _WheelPainter extends CustomPainter {
 
       final border = Paint()
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 2
+        ..strokeWidth = 3
         ..color = PoliColors.night;
       canvas.drawArc(
         Rect.fromCircle(center: center, radius: radius),
@@ -145,26 +156,31 @@ class _WheelPainter extends CustomPainter {
       oldDelegate.names != names;
 }
 
-/// Spins the wheel so the pointer (top) lands on [targetIndex].
+/// Spins so the top pointer lands inside [targetIndex], not on a divider.
 Future<void> animateWheelToIndex({
   required AnimationController controller,
   required ValueNotifier<double> turns,
   required int targetIndex,
   required int segmentCount,
+  Random? random,
 }) async {
-  final n = max(segmentCount, 1);
-  final segment = 1.0 / n;
-  // Pointer is at top; segment 0 center is at top initially.
-  final targetCenter = targetIndex * segment;
-  final extraSpins = 4 + Random().nextInt(2);
-  final endTurns = extraSpins + (1 - targetCenter);
-  final anim = Tween<double>(begin: turns.value, end: turns.value + endTurns)
-      .animate(CurvedAnimation(parent: controller, curve: Curves.easeOutCubic));
+  final plan = planWheelSpin(
+    currentTurns: turns.value,
+    targetIndex: targetIndex,
+    segmentCount: segmentCount,
+    random: random,
+  );
+
+  final anim = Tween<double>(begin: turns.value, end: plan.endTurns).animate(
+    CurvedAnimation(parent: controller, curve: Curves.easeOutCubic),
+  );
   void listener() => turns.value = anim.value;
   anim.addListener(listener);
   controller
-    ..duration = const Duration(milliseconds: 3200)
+    ..duration = Duration(milliseconds: 3800 + Random().nextInt(800))
     ..reset();
   await controller.forward();
   anim.removeListener(listener);
+  // Snap exactly to planned end (avoid float drift on the border).
+  turns.value = plan.endTurns;
 }

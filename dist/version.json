@@ -1,6 +1,6 @@
 {
-  "versionCode": 3,
-  "versionName": "1.1.1",
+  "versionCode": 4,
+  "versionName": "1.1.2",
   "apkUrl": "https://github.com/crabopal/birthday_sofia/raw/cursor/sonya-birthday-game-apk-922d/dist/sonya-birthday-release.apk",
-  "notes": "OTA канал — ветка cursor/sonya-birthday-game-apk-922d"
+  "notes": "Круг останавливается внутри сектора, как Поле чудес"
 }
