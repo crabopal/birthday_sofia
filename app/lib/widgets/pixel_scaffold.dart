@@ -22,6 +22,8 @@ class PixelScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // Keep controls reachable when the soft keyboard opens on phones.
+      resizeToAvoidBottomInset: true,
       body: Stack(
         fit: StackFit.expand,
         children: [

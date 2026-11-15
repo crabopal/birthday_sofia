@@ -14,7 +14,9 @@ import 'theme/app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Phone + TV: allow portrait and landscape; layouts adapt per screen.
   await SystemChrome.setPreferredOrientations(const [
+    DeviceOrientation.portraitUp,
     DeviceOrientation.landscapeLeft,
     DeviceOrientation.landscapeRight,
   ]);

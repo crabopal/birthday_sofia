@@ -157,6 +157,10 @@ class _SplashScreenState extends State<SplashScreen> {
     final busy = _gate == _SplashGate.checking ||
         _gate == _SplashGate.downloading ||
         _gate == _SplashGate.installing;
+    final size = MediaQuery.sizeOf(context);
+    final compact = size.height < 520 || size.width < 700;
+    final heroSize = compact ? 56.0 : 92.0;
+    final titleSize = compact ? 18.0 : 28.0;
 
     return PixelScaffold(
       showCharacters: false,
@@ -164,37 +168,40 @@ class _SplashScreenState extends State<SplashScreen> {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 980),
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 8),
+            padding: EdgeInsets.symmetric(
+              horizontal: compact ? 12 : 28,
+              vertical: 8,
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    _HeroChar('assets/images/chars/poli.jpg'),
-                    SizedBox(width: 14),
-                    _HeroChar('assets/images/chars/roy.jpg'),
-                    SizedBox(width: 14),
-                    _HeroChar('assets/images/chars/amber.jpg'),
-                    SizedBox(width: 14),
-                    _HeroChar('assets/images/chars/helly.jpg'),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: compact ? 8 : 14,
+                  children: [
+                    _HeroChar('assets/images/chars/poli.jpg', size: heroSize),
+                    _HeroChar('assets/images/chars/roy.jpg', size: heroSize),
+                    _HeroChar('assets/images/chars/amber.jpg', size: heroSize),
+                    _HeroChar('assets/images/chars/helly.jpg', size: heroSize),
                   ],
                 ),
-                const SizedBox(height: 18),
+                SizedBox(height: compact ? 10 : 18),
                 PixelPanel(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 28, vertical: 22),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: compact ? 14 : 28,
+                    vertical: compact ? 14 : 22,
+                  ),
                   child: Column(
                     children: [
-                      const Text(
+                      Text(
                         'С ДНЕМ РОЖДЕНИЯ,\nСОНЯ',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: 'PressStart2P',
-                          fontSize: 28,
+                          fontSize: titleSize,
                           height: 1.55,
                           color: PoliColors.robocarRed,
-                          shadows: [
+                          shadows: const [
                             Shadow(
                               color: PoliColors.amberYellow,
                               offset: Offset(2, 2),
@@ -202,7 +209,7 @@ class _SplashScreenState extends State<SplashScreen> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 14),
+                      SizedBox(height: compact ? 8 : 14),
                       Text(
                         'пиксельные спасатели · город робокаров',
                         textAlign: TextAlign.center,
@@ -213,7 +220,7 @@ class _SplashScreenState extends State<SplashScreen> {
                           height: 1.6,
                         ),
                       ),
-                      const SizedBox(height: 18),
+                      SizedBox(height: compact ? 10 : 18),
                       Text(
                         _status,
                         textAlign: TextAlign.center,
@@ -227,7 +234,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       if (_gate == _SplashGate.downloading) ...[
                         const SizedBox(height: 14),
                         SizedBox(
-                          width: 420,
+                          width: compact ? 240 : 420,
                           child: LinearProgressIndicator(
                             value: _progress.clamp(0.0, 1.0),
                             minHeight: 10,
@@ -249,27 +256,30 @@ class _SplashScreenState extends State<SplashScreen> {
                           ),
                         ),
                       ],
-                      const SizedBox(height: 22),
+                      SizedBox(height: compact ? 14 : 22),
                       if (_gate == _SplashGate.ready)
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          spacing: 10,
+                          runSpacing: 10,
                           children: [
                             TvButton(
                               label: 'СТАРТ',
                               autofocus: true,
+                              compact: compact,
                               onPressed: widget.onStart,
                             ),
-                            const SizedBox(width: 16),
                             TvButton(
                               label: 'РЕДАКТОР',
                               primary: false,
+                              compact: compact,
                               onPressed: widget.onEditor,
                             ),
-                            const SizedBox(width: 16),
                             TvButton(
                               label:
                                   _pending != null ? 'ОБНОВИТЬ' : 'ПРОВЕРИТЬ',
                               primary: false,
+                              compact: compact,
                               onPressed: _pending != null
                                   ? _retryInstall
                                   : _runUpdateFlow,
@@ -277,18 +287,21 @@ class _SplashScreenState extends State<SplashScreen> {
                           ],
                         )
                       else if (_gate == _SplashGate.installing)
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          spacing: 10,
+                          runSpacing: 10,
                           children: [
                             TvButton(
                               label: 'ПОВТОРИТЬ',
                               autofocus: true,
+                              compact: compact,
                               onPressed: _retryInstall,
                             ),
-                            const SizedBox(width: 16),
                             TvButton(
                               label: 'ИГРАТЬ ТАК',
                               primary: false,
+                              compact: compact,
                               onPressed: () =>
                                   setState(() => _gate = _SplashGate.ready),
                             ),
@@ -305,7 +318,7 @@ class _SplashScreenState extends State<SplashScreen> {
                         ),
                       const SizedBox(height: 14),
                       const Text(
-                        'Пульт: стрелки · OK · Back',
+                        'Пульт / касание',
                         style: TextStyle(
                           fontFamily: 'PressStart2P',
                           fontSize: 8,
@@ -325,15 +338,16 @@ class _SplashScreenState extends State<SplashScreen> {
 }
 
 class _HeroChar extends StatelessWidget {
-  const _HeroChar(this.path);
+  const _HeroChar(this.path, {this.size = 92});
 
   final String path;
+  final double size;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 92,
-      height: 92,
+      width: size,
+      height: size,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white, width: 4),

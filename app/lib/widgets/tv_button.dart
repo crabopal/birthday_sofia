@@ -12,6 +12,7 @@ class TvButton extends StatefulWidget {
     this.primary = true,
     this.enabled = true,
     this.focusNode,
+    this.compact = false,
   });
 
   final String label;
@@ -20,6 +21,7 @@ class TvButton extends StatefulWidget {
   final bool primary;
   final bool enabled;
   final FocusNode? focusNode;
+  final bool compact;
 
   @override
   State<TvButton> createState() => _TvButtonState();
@@ -45,7 +47,13 @@ class _TvButtonState extends State<TvButton> {
         ? PoliColors.focusRing
         : (widget.primary ? const Color(0xFFB71C1C) : const Color(0xFF1565C0));
     final fg = enabled ? Colors.white : PoliColors.inkSoft;
+    final pad = widget.compact
+        ? const EdgeInsets.symmetric(horizontal: 14, vertical: 10)
+        : const EdgeInsets.symmetric(horizontal: 28, vertical: 18);
+    final fontSize = widget.compact ? 10.0 : 12.0;
 
+    // Material + InkWell so phone taps always register; FocusableActionDetector
+    // keeps D-pad / remote ActivateIntent working on TV.
     return FocusableActionDetector(
       focusNode: widget.focusNode,
       autofocus: widget.autofocus,
@@ -68,38 +76,41 @@ class _TvButtonState extends State<TvButton> {
         SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
         SingleActivator(LogicalKeyboardKey.gameButtonA): ActivateIntent(),
       },
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: enabled ? _activate : null,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 120),
-          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 18),
-          decoration: BoxDecoration(
-            color: bg,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: border, width: _focused ? 4 : 3),
-            boxShadow: _focused
-                ? [
-                    BoxShadow(
-                      color: PoliColors.amberYellow.withValues(alpha: 0.55),
-                      blurRadius: 14,
-                      spreadRadius: 1,
-                    ),
-                  ]
-                : [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.18),
-                      blurRadius: 6,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-          ),
-          child: Text(
-            widget.label,
-            style: TextStyle(
-              fontFamily: 'PressStart2P',
-              fontSize: 12,
-              color: fg,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: enabled ? _activate : null,
+          borderRadius: BorderRadius.circular(12),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 120),
+            padding: pad,
+            decoration: BoxDecoration(
+              color: bg,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: border, width: _focused ? 4 : 3),
+              boxShadow: _focused
+                  ? [
+                      BoxShadow(
+                        color: PoliColors.amberYellow.withValues(alpha: 0.55),
+                        blurRadius: 14,
+                        spreadRadius: 1,
+                      ),
+                    ]
+                  : [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.18),
+                        blurRadius: 6,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+            ),
+            child: Text(
+              widget.label,
+              style: TextStyle(
+                fontFamily: 'PressStart2P',
+                fontSize: fontSize,
+                color: fg,
+              ),
             ),
           ),
         ),
