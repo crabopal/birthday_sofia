@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -70,23 +71,39 @@ class AppUpdater {
       final info = await PackageInfo.fromPlatform();
       final localCode = int.tryParse(info.buildNumber) ?? 0;
 
-      final response = await _dio.get<Map<String, dynamic>>(
+      // GitHub raw serves text/plain — decode JSON manually.
+      final response = await _dio.get<dynamic>(
         UpdateConfig.manifestUrl,
         options: Options(
-          responseType: ResponseType.json,
-          receiveTimeout: const Duration(seconds: 12),
-          sendTimeout: const Duration(seconds: 12),
+          responseType: ResponseType.plain,
+          receiveTimeout: const Duration(seconds: 15),
+          sendTimeout: const Duration(seconds: 15),
+          headers: const {'Accept': 'application/json, text/plain, */*'},
+          followRedirects: true,
+          validateStatus: (code) => code != null && code >= 200 && code < 400,
         ),
       );
-      final data = response.data;
-      if (data == null) {
+
+      final raw = response.data;
+      final Map<String, dynamic> data;
+      if (raw is Map<String, dynamic>) {
+        data = raw;
+      } else if (raw is String) {
+        data = jsonDecode(raw) as Map<String, dynamic>;
+      } else {
         return UpdateCheck(
           result: UpdateCheckResult.failed,
           localVersionCode: localCode,
-          message: 'Пустой манифест',
+          message: 'Неожиданный ответ манифеста',
         );
       }
+
       final manifest = UpdateManifest.fromJson(data);
+      debugPrint(
+        'OTA local=$localCode remote=${manifest.versionCode} '
+        'url=${UpdateConfig.manifestUrl}',
+      );
+
       if (manifest.versionCode > localCode) {
         return UpdateCheck(
           result: UpdateCheckResult.available,
@@ -98,6 +115,7 @@ class AppUpdater {
         result: UpdateCheckResult.upToDate,
         manifest: manifest,
         localVersionCode: localCode,
+        message: 'Локально $localCode ≥ ${manifest.versionCode}',
       );
     } catch (e) {
       debugPrint('Update check failed: $e');
@@ -133,6 +151,11 @@ class AppUpdater {
         receiveTimeout: const Duration(minutes: 10),
       ),
     );
+
+    final length = await file.length();
+    if (length < 1000) {
+      throw StateError('Скачанный файл слишком маленький ($length байт)');
+    }
 
     final result = await OpenFilex.open(
       file.path,

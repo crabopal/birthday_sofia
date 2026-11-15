@@ -53,9 +53,21 @@ class _SplashScreenState extends State<SplashScreen> {
     if (check.result != UpdateCheckResult.available || check.manifest == null) {
       setState(() {
         _gate = _SplashGate.ready;
-        _status = check.result == UpdateCheckResult.upToDate
-            ? 'Актуальная версия'
-            : 'Обновление пропущено';
+        switch (check.result) {
+          case UpdateCheckResult.upToDate:
+            _status =
+                'Актуальная версия (${check.localVersionCode ?? '?'})';
+            _error = null;
+          case UpdateCheckResult.failed:
+            _status = 'Не удалось проверить обновление';
+            _error = check.message;
+          case UpdateCheckResult.skipped:
+            _status = 'Обновление пропущено';
+            _error = check.message;
+          case UpdateCheckResult.available:
+            _status = 'Обновление недоступно';
+            _error = check.message;
+        }
       });
       return;
     }
@@ -226,14 +238,12 @@ class _SplashScreenState extends State<SplashScreen> {
                         primary: false,
                         onPressed: widget.onEditor,
                       ),
-                      if (_pending != null) ...[
-                        const SizedBox(width: 20),
-                        TvButton(
-                          label: 'ОБНОВИТЬ',
-                          primary: false,
-                          onPressed: _retryInstall,
-                        ),
-                      ],
+                      const SizedBox(width: 20),
+                      TvButton(
+                        label: _pending != null ? 'ОБНОВИТЬ' : 'ПРОВЕРИТЬ',
+                        primary: false,
+                        onPressed: _pending != null ? _retryInstall : _runUpdateFlow,
+                      ),
                     ],
                   )
                 else if (_gate == _SplashGate.installing)
