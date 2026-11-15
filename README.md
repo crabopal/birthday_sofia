@@ -26,6 +26,14 @@ app/                      Flutter-проект (Android TV + web)
 android/                  LEANBACK_LAUNCHER, landscape
 ```
 
+## Скачать APK
+
+Готовый release лежит в репозитории (не в `build/` — эта папка в `.gitignore`):
+
+- [`dist/sonya-birthday-release.apk`](dist/sonya-birthday-release.apk)
+
+На GitHub: откройте файл → кнопка **Download** / **View raw**.
+
 ## Сборка APK
 
 Нужны Flutter (stable) и Android SDK.
