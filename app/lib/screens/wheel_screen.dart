@@ -103,16 +103,6 @@ class _WheelScreenState extends State<WheelScreen>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Равноразделенный круг.\nВыбывает до нового круга.',
-                          style: TextStyle(
-                            fontFamily: 'PressStart2P',
-                            fontSize: 10,
-                            height: 1.7,
-                            color: PoliColors.ink,
-                          ),
-                        ),
-                        const SizedBox(height: 24),
                         if (_winner == null)
                           TvButton(
                             label: _spinning ? 'КРУТИТСЯ...' : 'КРУТИТЬ',
