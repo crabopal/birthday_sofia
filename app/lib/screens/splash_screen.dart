@@ -2,6 +2,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../services/app_updater.dart';
 import '../theme/app_theme.dart';
+import '../widgets/char_portrait_frame.dart';
 import '../widgets/pixel_scaffold.dart';
 import '../widgets/tv_button.dart';
 
@@ -345,24 +346,11 @@ class _HeroChar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final radius = BorderRadius.circular(size * 0.17);
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        // Same blue as char art so rounded corners never flash white.
-        color: PoliColors.charCardBg,
-        borderRadius: radius,
-        border: Border.all(color: Colors.white, width: 4),
-        boxShadow: [
-          BoxShadow(
-            color: PoliColors.robocarRed.withValues(alpha: 0.28),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      clipBehavior: Clip.antiAlias,
+    return CharPortraitFrame(
+      size: size,
+      borderWidth: 4,
+      radiusFactor: 0.17,
+      shadowColor: PoliColors.robocarRed,
       child: Image.asset(
         path,
         fit: BoxFit.cover,

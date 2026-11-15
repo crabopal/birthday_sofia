@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 
 import '../theme/app_theme.dart';
+import 'char_portrait_frame.dart';
 
 /// Full-bleed rescue-city backdrop with optional character decorations.
 class PixelScaffold extends StatelessWidget {
@@ -175,24 +176,11 @@ class _CharSprite extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final radius = BorderRadius.circular(size * 0.14);
-    return Container(
-      width: size,
-      height: size,
+    return CharPortraitFrame(
+      size: size,
+      borderWidth: 3,
+      radiusFactor: 0.14,
       margin: const EdgeInsets.only(bottom: 6),
-      decoration: BoxDecoration(
-        color: PoliColors.charCardBg,
-        borderRadius: radius,
-        border: Border.all(color: Colors.white, width: 3),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.25),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      clipBehavior: Clip.antiAlias,
       child: Image.asset(
         path,
         fit: BoxFit.cover,

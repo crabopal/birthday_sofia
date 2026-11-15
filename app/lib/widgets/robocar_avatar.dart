@@ -2,6 +2,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../models/robocar_character.dart';
 import '../theme/app_theme.dart';
+import 'char_portrait_frame.dart';
 
 class RobocarAvatar extends StatelessWidget {
   const RobocarAvatar({
@@ -15,23 +16,10 @@ class RobocarAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final radius = BorderRadius.circular(size * 0.18);
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        color: PoliColors.charCardBg,
-        borderRadius: radius,
-        border: Border.all(color: Colors.white, width: 2),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.18),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      clipBehavior: Clip.antiAlias,
+    return CharPortraitFrame(
+      size: size,
+      borderWidth: 2,
+      radiusFactor: 0.18,
       child: character == null
           ? const ColoredBox(
               color: PoliColors.panelDeep,

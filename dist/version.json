@@ -1,6 +1,6 @@
 {
-  "versionCode": 20,
-  "versionName": "1.2.14",
+  "versionCode": 21,
+  "versionName": "1.2.15",
   "apkUrl": "https://raw.githubusercontent.com/crabopal/birthday_sofia/cursor%2Fsonya-birthday-game-apk-922d/dist/sonya-birthday-release.apk",
-  "notes": "Remove wheel screen helper description text"
+  "notes": "Character frames: white rim only as border, rounded sky-blue fill"
 }
