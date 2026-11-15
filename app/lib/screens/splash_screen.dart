@@ -349,6 +349,7 @@ class _HeroChar extends StatelessWidget {
       child: Image.asset(
         path,
         fit: BoxFit.cover,
+        filterQuality: FilterQuality.none,
         errorBuilder: (_, __, ___) => const ColoredBox(
           color: PoliColors.panelDeep,
           child:

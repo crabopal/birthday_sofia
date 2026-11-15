@@ -9,7 +9,7 @@ class PixelScaffold extends StatelessWidget {
     required this.child,
     this.title,
     this.trailing,
-    this.showCharacters = true,
+    this.showCharacters = false,
     this.dimContent = false,
   });
 
