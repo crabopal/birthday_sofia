@@ -1,9 +1,6 @@
 /// Where the installed APK looks for newer builds.
-///
-/// After this PR is merged into `main`, keep [gitRef] as `main` so every
-/// push of `dist/version.json` + APK becomes an OTA update.
 class UpdateConfig {
-  static const gitRef = 'main';
+  static const gitRef = 'cursor/sonya-birthday-game-apk-922d';
 
   static const repo = 'crabopal/birthday_sofia';
 
