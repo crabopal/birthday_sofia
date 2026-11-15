@@ -16,6 +16,7 @@ dependencies:
   path_provider: ^2.1.6
   shelf: ^1.4.3
   shelf_router: ^1.1.5
+  flutter_tts: ^4.2.5
 
 dev_dependencies:
   flutter_test:

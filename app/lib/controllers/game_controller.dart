@@ -11,11 +11,12 @@ class GameController extends ChangeNotifier {
     VoiceService? voice,
     FairQueue? queue,
     LevelPackStore? store,
-  })  : _voice = voice ?? VoiceService(),
-        _queue = queue ?? FairQueue(),
-        store = store ?? LevelPackStore();
+  })  : store = store ?? LevelPackStore(),
+        _queue = queue ?? FairQueue() {
+    _voice = voice ?? VoiceService(store: this.store);
+  }
 
-  final VoiceService _voice;
+  late final VoiceService _voice;
   final FairQueue _queue;
   final LevelPackStore store;
 
@@ -152,10 +153,13 @@ class GameController extends ChangeNotifier {
   void openLevel() {
     _snapshot = _snapshot.copyWith(phase: GamePhase.level, clearFeedback: true);
     notifyListeners();
+    // Short SFX; question narration is handled on LevelScreen when the
+    // question is actually shown (after video pause for video levels).
     final level = currentLevel;
     if (level != null) {
-      _voice.playKey('start', local: level.voiceLines);
-      if (!level.voiceLines.containsKey('start')) {
+      if (level.voiceLines.containsKey('start')) {
+        _voice.playKey('start', local: level.voiceLines);
+      } else {
         _voice.playKey('level_start');
       }
     }

@@ -39,6 +39,13 @@ class _LevelScreenState extends State<LevelScreen> {
     _initMedia();
   }
 
+  Future<void> _speakQuestion(String question) async {
+    // Let the short level_start SFX finish first.
+    await Future<void>.delayed(const Duration(milliseconds: 450));
+    if (!mounted) return;
+    await widget.controller.voice.speakText(question);
+  }
+
   Future<void> _initMedia() async {
     final lvl = level;
     if (lvl == null) return;
@@ -46,7 +53,10 @@ class _LevelScreenState extends State<LevelScreen> {
     if (lvl.type == LevelType.videoQuestion && lvl.videoAsset != null) {
       final controller = await _resolver.openVideo(lvl.videoAsset);
       if (controller == null) {
-        if (mounted) setState(() => _mediaReady = true);
+        if (mounted) {
+          setState(() => _mediaReady = true);
+          await _speakQuestion(lvl.question);
+        }
         return;
       }
       _video = controller;
@@ -54,16 +64,25 @@ class _LevelScreenState extends State<LevelScreen> {
       controller.addListener(_onVideoTick);
       await controller.play();
       if (mounted) setState(() => _mediaReady = true);
+      // Question is spoken when the video pauses (see _onVideoTick).
+      if (lvl.pauseAtMs == null) {
+        await _speakQuestion(lvl.question);
+      }
     } else if (lvl.type == LevelType.audioQuestion && lvl.audioAsset != null) {
+      // Narrate the question first, then play the puzzle audio.
+      if (mounted) setState(() => _mediaReady = true);
+      await _speakQuestion(lvl.question);
+      if (!mounted) return;
       _audio = AudioPlayer();
       final source = await _resolver.audioSource(lvl.audioAsset);
       if (source != null) await _audio!.play(source);
-      if (mounted) setState(() => _mediaReady = true);
     } else if (lvl.type == LevelType.pictureQuestion) {
       _image = await _resolver.imageWidget(lvl.imageAsset);
       if (mounted) setState(() => _mediaReady = true);
+      await _speakQuestion(lvl.question);
     } else {
       if (mounted) setState(() => _mediaReady = true);
+      await _speakQuestion(lvl.question);
     }
   }
 
@@ -77,6 +96,7 @@ class _LevelScreenState extends State<LevelScreen> {
       video.pause();
       setState(() => _videoPausedForQuestion = true);
       _answerFocus.requestFocus();
+      _speakQuestion(lvl.question);
     }
   }
 
@@ -85,6 +105,7 @@ class _LevelScreenState extends State<LevelScreen> {
     if (lvl?.audioAsset == null || _audio == null) return;
     final source = await _resolver.audioSource(lvl!.audioAsset);
     if (source == null) return;
+    await widget.controller.voice.stopAll();
     await _audio!.stop();
     await _audio!.play(source);
   }
@@ -114,6 +135,7 @@ class _LevelScreenState extends State<LevelScreen> {
     _audio?.dispose();
     _answerController.dispose();
     _answerFocus.dispose();
+    widget.controller.voice.stopAll();
     super.dispose();
   }
 
